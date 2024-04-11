@@ -38,7 +38,7 @@ router.beforeEach(async(to, from, next) => {
 
           next()
         } catch (error) {
-          // 移除token并回到登录dmdm
+          // 移除token并回到登录页面
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')
           next(`/login?redirect=${to.path}`)

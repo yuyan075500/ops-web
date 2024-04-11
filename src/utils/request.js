@@ -17,7 +17,7 @@ service.interceptors.request.use(
 
     if (store.getters.token) {
       // 指定后端认证请求头的参数名，根据实际情况修改
-      config.headers['X-Token'] = getToken()
+      config.headers['Authorization'] = `Bearer ${getToken()}`
     }
     return config
   },

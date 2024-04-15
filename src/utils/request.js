@@ -35,7 +35,7 @@ service.interceptors.response.use(
 
     // 指定后端返回的正确业务状态码，默认为0
     if (res.code !== 0) {
-      // 业务状态码为0的请求处理
+      // 业务状态码为非0的请求处理
 
       Message({
         message: res.message || 'Error',
@@ -62,7 +62,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    // 返回的HTTP状态码非200的请求处理
+    // HTTP状态码非200的请求处理
     console.log('err' + error)
     Message({
       message: error.message,

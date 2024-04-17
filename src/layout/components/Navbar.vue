@@ -54,6 +54,7 @@
             :limit="1"
             :multiple="false"
             :auto-upload="true"
+            :file-list="fileList"
             :show-file-list="false"
             :on-change="handleChange"
             :on-success="handleSuccess"
@@ -124,7 +125,6 @@ export default {
     /* 图片发生变化 */
     handleChange(file, fileList) {
       this.avatarPreview = URL.createObjectURL(file.raw)
-      console.log(this.avatarPreview)
     },
 
     /* 图片上传成功回调*/
@@ -135,6 +135,7 @@ export default {
           type: 'success',
           duration: 2000
         })
+        this.fileList = []
       }
     }
   }

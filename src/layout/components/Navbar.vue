@@ -7,7 +7,8 @@
     <div class="right">
       <el-dropdown trigger="click" placement="bottom">
         <div class="right-item">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="right-item-img">
+          <img v-if="avatar !== ''" :src="avatar" class="right-item-img">
+          <img v-else src="../../assets/avatar/default.jpg" class="right-item-img">
           <div class="user-name">{{ name }}</div>
           <i class="el-icon-caret-bottom" />
           <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -43,6 +44,26 @@
         <el-form-item label="手机号：">
           <span>{{ phone_number }}</span>
         </el-form-item>
+        <el-form-item label="头像：">
+          <el-upload
+            name="avatar"
+            class="avatar-uploader"
+            accept="image/jpeg,image/jpg,image/png"
+            :headers="{ Authorization: `Bearer ${token}` }"
+            :action="uploadUrl"
+            :limit="1"
+            :multiple="false"
+            :auto-upload="true"
+            :show-file-list="false"
+            :on-change="handleChange"
+            :on-success="handleSuccess"
+          >
+            <img v-if="avatarPreview !== undefined" :src="avatarPreview" class="avatar">
+            <img v-else-if="avatar !== ''" :src="avatar" class="avatar">
+            <img v-else src="../../assets/avatar/default.jpg" class="avatar">
+          </el-upload>
+          <div class="help-block" style="color: #999; font-size: 12px; line-height: 0px;">点击图片可更换个性化头像</div>
+        </el-form-item>
       </el-form>
       <div class="drawer-footer">
         <el-button @click="userInfoDrawer = false">取 消</el-button>
@@ -54,9 +75,11 @@
 </template>
 
 <script>
+import { Message } from 'element-ui'
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { getToken } from '@/utils/auth'
 
 export default {
   components: {
@@ -66,7 +89,10 @@ export default {
   data() {
     return {
       userInfoDrawer: false,
-      form: {}
+      form: {},
+      avatarPreview: undefined,
+      fileList: [],
+      token: getToken()
     }
   },
   computed: {
@@ -77,7 +103,14 @@ export default {
       'username',
       'email',
       'phone_number'
-    ])
+    ]),
+    uploadUrl() {
+      if (process.env.VUE_APP_BASE_API === '\'') {
+        return '/api/v1/user/avatarUpload'
+      } else {
+        return process.env.VUE_APP_BASE_API + '/api/v1/user/avatarUpload'
+      }
+    }
   },
   methods: {
     toggleSideBar() {
@@ -86,6 +119,23 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+
+    /* 图片发生变化 */
+    handleChange(file, fileList) {
+      this.avatarPreview = URL.createObjectURL(file.raw)
+      console.log(this.avatarPreview)
+    },
+
+    /* 图片上传成功回调*/
+    handleSuccess(res, file, fileList) {
+      if (res.code === 0) {
+        Message({
+          message: res.msg,
+          type: 'success',
+          duration: 2000
+        })
+      }
     }
   }
 }
@@ -114,6 +164,25 @@ export default {
 
   .breadcrumb-container {
     float: left;
+  }
+}
+// 个人信息页面头像
+.avatar-uploader {
+  .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    .avatar {
+      width: 178px;
+      height: 178px;
+      display: block;
+    }
+  }
+  .el-upload:hover {
+    border-color: #409EFF;
   }
 }
 

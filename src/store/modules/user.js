@@ -66,7 +66,7 @@ const actions = {
   // 获取用户信息
   getInfo({ commit }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
 
         if (!data) {

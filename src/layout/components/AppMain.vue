@@ -1,18 +1,32 @@
 <template>
-  <section class="app-main">
+  <section ref="container" class="app-main">
     <transition name="fade-transform" mode="out-in">
-      <router-view :key="key" />
+      <keep-alive :include="cachedViews">
+        <router-view :key="key" />
+      </keep-alive>
     </transition>
   </section>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import Watermark from '@/utils/watermark'
+
 export default {
   name: 'AppMain',
   computed: {
+    ...mapGetters([
+      'name'
+    ]),
     key() {
       return this.$route.path
     }
+  },
+  mounted: function() {
+    // 水印的内容（这里获取的登录用户姓名）
+    const name = this.name
+    // 获取容器（这里是右侧内容显示区域）
+    Watermark.set(name, this.$refs.container)
   }
 }
 </script>

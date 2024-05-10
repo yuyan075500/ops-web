@@ -10,9 +10,17 @@ export function login(data) {
 }
 
 // 获取当前登录的用户信息
-export function getInfo() {
+export function getUserInfo() {
   return request({
     url: '/api/v1/user/info',
+    method: 'get'
+  })
+}
+
+// 获取当前登录的用户菜单
+export function getUserMenu() {
+  return request({
+    url: '/api/v1/menus',
     method: 'get'
   })
 }

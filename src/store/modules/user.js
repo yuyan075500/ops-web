@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getUserInfo, getUserMenu } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -17,7 +17,9 @@ const getDefaultState = () => {
     // 电话
     phone_number: '',
     // ID
-    id: ''
+    id: '',
+    // 菜单
+    menu: []
   }
 }
 
@@ -44,6 +46,12 @@ const mutations = {
   },
   SET_PHONE_NUMBER: (state, phone_number) => {
     state.phone_number = phone_number
+  },
+  SET_ID: (state, id) => {
+    state.id = id
+  },
+  SET_MENUS: (state, menus) => {
+    state.menus = menus
   }
 }
 
@@ -54,7 +62,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         const { token } = response
+        // 将token存储到vuex中
         commit('SET_TOKEN', token)
+        // 将token存储到cookie中
         setToken(token)
         resolve()
       }).catch(error => {
@@ -66,21 +76,40 @@ const actions = {
   // 获取用户信息
   getInfo({ commit }) {
     return new Promise((resolve, reject) => {
-      getInfo().then(response => {
-        const { data } = response
+      getUserInfo().then(response => {
+        if (response.code === 0) {
+          const { data } = response
+          const { id, name, avatar, username, email, phone_number } = data
 
-        if (!data) {
-          return reject('认证失败，请重新登录.')
+          // 将用户信息存储到vuex中
+          commit('SET_NAME', name)
+          commit('SET_AVATAR', avatar)
+          commit('SET_USERNAME', username)
+          commit('SET_EMAIL', email)
+          commit('SET_ID', id)
+          commit('SET_PHONE_NUMBER', phone_number)
+          resolve(data)
         }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
 
-        const { name, avatar, username, email, phone_number } = data
-
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_USERNAME', username)
-        commit('SET_EMAIL', email)
-        commit('SET_PHONE_NUMBER', phone_number)
-        resolve(data)
+  // 获取用户菜单
+  getMenu({ commit }) {
+    return new Promise((resolve, reject) => {
+      getUserMenu().then(response => {
+        if (response.code === 0) {
+          // 增加404路由到末尾
+          response.data.push(
+            { path: '/404', component: '404', hidden: true },
+            { path: '*', redirect: '/404', hidden: true }
+          )
+          // 将用户路由信息存储到vuex中
+          commit('SET_MENUS', response.data)
+          resolve(response)
+        }
       }).catch(error => {
         reject(error)
       })
@@ -91,8 +120,11 @@ const actions = {
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
-        removeToken() // 用户注销后必须移除Token
+        // 移除Token
+        removeToken()
+        // 重置路由
         resetRouter()
+        // 重置vuex中的用户信息
         commit('RESET_STATE')
         resolve()
       }).catch(error => {
@@ -104,7 +136,9 @@ const actions = {
   // 移除Token
   resetToken({ commit }) {
     return new Promise(resolve => {
+      // 移除Token
       removeToken()
+      // 重置vuex中的用户信息
       commit('RESET_STATE')
       resolve()
     })

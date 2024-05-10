@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">页面: Dashboard</div>
     <div class="dashboard-text">name: {{ name }}</div>
   </div>
 </template>

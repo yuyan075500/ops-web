@@ -38,9 +38,9 @@ service.interceptors.response.use(
       // 业务状态码为非0的请求处理
 
       Message({
-        message: res.message || 'Error',
+        message: res.msg,
         type: 'error',
-        duration: 5 * 1000
+        duration: 2 * 1000
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
@@ -63,9 +63,8 @@ service.interceptors.response.use(
   },
   error => {
     // HTTP状态码非200的请求处理
-    console.log('err' + error)
     Message({
-      message: error.message,
+      message: error.msg,
       type: 'error',
       duration: 5 * 1000
     })

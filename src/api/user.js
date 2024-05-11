@@ -9,6 +9,14 @@ export function login(data) {
   })
 }
 
+// 用户注销
+export function logout() {
+  return request({
+    url: '/logout',
+    method: 'post'
+  })
+}
+
 // 获取当前登录的用户信息
 export function getUserInfo() {
   return request({
@@ -22,13 +30,5 @@ export function getUserMenu() {
   return request({
     url: '/api/v1/menus',
     method: 'get'
-  })
-}
-
-// 用户注销
-export function logout() {
-  return request({
-    url: '/logout',
-    method: 'post'
   })
 }

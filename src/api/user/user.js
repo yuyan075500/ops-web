@@ -43,3 +43,11 @@ export function resetPassword(data) {
     data
   })
 }
+
+// MFA重置
+export function resetMFA(data) {
+  return request({
+    url: '/api/v1/user/reset_mfa/' + data.id,
+    method: 'put'
+  })
+}

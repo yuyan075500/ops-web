@@ -30,7 +30,7 @@
               <el-button class="el-button-text" size="mini" type="text" @click="handlePassword(scope.row)">用户密码重置</el-button>
             </el-dropdown-item>
             <el-dropdown-item>
-              <el-button class="el-button-text" size="mini" type="text">MFA验证码重置</el-button>
+              <el-button class="el-button-text" size="mini" type="text" @click="handleMFA(scope.row)">MFA验证码重置</el-button>
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -71,6 +71,11 @@ export default {
     /* 重置密码按钮 */
     handlePassword(value) {
       this.$emit('reset_password', value)
+    },
+
+    /* 重置MFA按钮 */
+    handleMFA(value) {
+      this.$emit('mfa', value)
     },
 
     /* 日期时间格式化 */

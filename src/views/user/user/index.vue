@@ -25,6 +25,7 @@
       @edit="handleEditUser"
       @delete="handleDelete"
       @active="handleSubmit"
+      @mfa="handleMFA"
       @reset_password="handleResetUserPassword"
     />
 
@@ -93,7 +94,7 @@
 
 <script>
 import { Message } from 'element-ui'
-import { getUserList, addUser, changeUser, resetPassword, deleteUser } from '@/api/user/user'
+import { getUserList, addUser, changeUser, resetPassword, deleteUser, resetMFA } from '@/api/user/user'
 import UserListTable from './table'
 import UserAddForm from './form'
 import ResetUserPasswordForm from './reset-password-form'
@@ -170,9 +171,36 @@ export default {
       this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
 
+    /* 重置用户密码 */
+    handleResetUserPassword(rowData) {
+      // 打开Dialog
+      this.resetPasswordDialog = true
+      // 更改弹框标题
+      this.formTitle = '重置用户密码'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = {
+        'id': rowData.id,
+        'password': '',
+        're_password': ''
+      }
+    },
+
+    /* 表单关闭 */
+    handleClose() {
+      // 关闭所有Dialog
+      this.userAddDialog = false
+      this.resetPasswordDialog = false
+      // 清空表单数据
+      this.currentValue = undefined
+      // 清空校验规则
+      this.$refs.form.$refs.form.resetFields()
+      // 获取最新数据
+      this.getList()
+    },
+
     /* 删除用户 */
     handleDelete(rowData) {
-      this.$confirm('点击确认开始同步。', '提示', {
+      this.$confirm('点击确认当前用户将从系统中永久删除。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -205,31 +233,37 @@ export default {
       }).then(() => {}).catch(() => {})
     },
 
-    /* 重置用户密码 */
-    handleResetUserPassword(rowData) {
-      // 打开Dialog
-      this.resetPasswordDialog = true
-      // 更改弹框标题
-      this.formTitle = '重置用户密码'
-      // 将当前行数据赋值给currentValue
-      this.currentValue = {
-        'id': rowData.id,
-        'password': '',
-        're_password': ''
-      }
-    },
-
-    /* 表单关闭 */
-    handleClose() {
-      // 关闭Dialog
-      this.userAddDialog = false
-      this.resetPasswordDialog = false
-      // 清空表单数据
-      this.currentValue = undefined
-      // 清空校验规则
-      this.$refs.form.$refs.form.resetFields()
-      // 获取最新数据
-      this.getList()
+    /* 重置用户MFA */
+    handleMFA(rowData) {
+      this.$confirm('点击确认当前用户的MFA将会被重置，用户下次登录时需要重新绑定。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        showClose: false,
+        closeOnClickModal: false,
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '重置中...'
+            resetMFA(rowData).then((res) => {
+              if (res.code === 0) {
+                Message({
+                  message: res.msg,
+                  type: 'success',
+                  duration: 1000
+                })
+                instance.confirmButtonLoading = false
+                done()
+              }
+            }).finally(() => {
+              instance.confirmButtonLoading = false
+              instance.confirmButtonText = '确定'
+            })
+          } else {
+            done()
+          }
+        }
+      }).then(() => {}).catch(() => {})
     },
 
     /* 表单提交 */
@@ -238,6 +272,7 @@ export default {
       // 使用id进行判断，有id表示修改，没有表示新增
       if (formData.id) {
         if (formData.password && formData.re_password) {
+          // 重置密码
           resetPassword(formData).then((res) => {
             if (res.code === 0) {
               Message({
@@ -252,6 +287,7 @@ export default {
             this.loading = false
           })
         } else {
+          // 更新用户信息
           changeUser(formData).then((res) => {
             if (res.code === 0) {
               Message({
@@ -267,6 +303,7 @@ export default {
           })
         }
       } else {
+        // 添加用户
         addUser(formData).then((res) => {
           if (res.code === 0) {
             Message({

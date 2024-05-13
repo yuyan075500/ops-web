@@ -2,31 +2,31 @@
   <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%" size="small">
     <el-row>
       <el-col :span="12">
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="用户名：" prop="username">
           <el-input v-model="form.username" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="姓名" prop="name">
+        <el-form-item label="姓名：" prop="name">
           <el-input v-model="form.name" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="12">
-        <el-form-item label="邮箱地址" prop="email">
+        <el-form-item label="邮箱地址：" prop="email">
           <el-input v-model="form.email" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
       <el-col :span="12">
-        <el-form-item label="手机号" prop="phone_number">
+        <el-form-item label="手机号：" prop="phone_number">
           <el-input v-model.number="form.phone_number" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="12">
-        <el-form-item v-if="form.id === undefined" label="用户密码" prop="password">
+        <el-form-item v-if="form.id === undefined" label="用户密码：" prop="password">
           <el-input v-model="form.password" type="password" show-password autocomplete="off" clearable />
           <div class="help-block" style="color: #999; font-size: 12px"><el-link :underline="false" type="primary" @click="handleGeneratePassword">点击生成随机密码</el-link></div>
         </el-form-item>

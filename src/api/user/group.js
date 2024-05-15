@@ -34,3 +34,12 @@ export function changeGroup(data) {
     data
   })
 }
+
+// 分组用户管理
+export function changeGroupUser(data) {
+  return request({
+    url: '/api/v1/group/users',
+    method: 'put',
+    data
+  })
+}

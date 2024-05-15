@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '自动化运维平台',
+  title: '统一认证中心',
 
   /**
    * @type {boolean} true | false

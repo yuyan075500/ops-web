@@ -23,6 +23,7 @@
       v-loading="loading"
       :table-data="tableData"
       @edit="handleEditGroup"
+      @user="handleEditUser"
       @delete="handleDelete"
       @active="handleSubmit"
     />
@@ -44,7 +45,7 @@
       :title="formTitle"
       :visible.sync="groupAddDialog"
       :show-close="false"
-      width="800px"
+      width="500px"
       :close-on-click-modal="false"
       @close="handleClose"
     >
@@ -57,19 +58,34 @@
         @submit="handleSubmit"
       />
     </el-dialog>
+
+    <!-- 用户管理 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="userDialog"
+      :show-close="false"
+      width="800px"
+      :close-on-click-modal="false"
+      @close="handleClose"
+    >
+      <add-user-transfer :form="currentValue" :transfer-data="transferData" @close="handleClose" @submit="handleUserSubmit" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui'
-import { getGroupList, addGroup, changeGroup, deleteGroup } from '@/api/user/group'
+import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser } from '@/api/user/group'
+import { getUserListAll } from '@/api/user/user'
 import GroupListTable from './table'
 import GroupAddForm from './form'
+import AddUserTransfer from './user-transfer'
 
 export default {
   components: {
     GroupListTable,
-    GroupAddForm
+    GroupAddForm,
+    AddUserTransfer
   },
   data() {
     return {
@@ -78,16 +94,23 @@ export default {
       total: 0,
       formTitle: undefined,
       currentValue: undefined,
+      transferData: {
+        leftData: [],
+        rightData: []
+      },
       queryParams: {
         name: '',
         page: 1,
         limit: 15
       },
-      groupAddDialog: false
+      groupAddDialog: false,
+      userDialog: false
+
     }
   },
   created() {
     this.getList()
+    this.getUserList()
   },
   methods: {
     /* 查找数据 */
@@ -103,6 +126,19 @@ export default {
         this.tableData = res.data.items
         this.total = res.data.total
         this.loading = false
+      })
+    },
+
+    // 获取所有用户
+    getUserList() {
+      getUserListAll().then((res) => {
+        const data = res.data.users
+        for (let i = 0; i < data.length; i++) {
+          this.transferData.leftData.push({
+            label: data[i].name,
+            key: data[i].id
+          })
+        }
       })
     },
 
@@ -136,12 +172,28 @@ export default {
       this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
 
+    /* 管理角色用户 */
+    handleEditUser(rowData) {
+      // 显示弹框
+      this.userDialog = true
+      // 更改弹框标题
+      this.formTitle = '用户管理'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
+      // 定义分组已存在用户列表
+      for (let i = 0; i < rowData.users.length; i++) {
+        this.transferData.rightData.push(rowData.users[i].ID)
+      }
+    },
+
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
       this.groupAddDialog = false
-      // 清空表单数据
+      this.userDialog = false
+      // 清空表单及空梭框数据
       this.currentValue = undefined
+      this.transferData.rightData = []
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据
@@ -181,6 +233,25 @@ export default {
           }
         }
       }).then(() => {}).catch(() => {})
+    },
+
+    /* 分组用户修改 */
+    handleUserSubmit(formData) {
+      this.loading = true
+      console.log(formData)
+      changeGroupUser(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
     },
 
     /* 表单提交 */

@@ -9,6 +9,14 @@ export function getUserList(params) {
   })
 }
 
+// 获取用户列表（所有）
+export function getUserListAll() {
+  return request({
+    url: '/api/v1/user/list',
+    method: 'get'
+  })
+}
+
 // 新增用户
 export function addUser(data) {
   return request({

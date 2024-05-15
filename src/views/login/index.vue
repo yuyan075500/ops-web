@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">自动化运维平台</h3>
+        <h3 class="title">信息化统一认证</h3>
       </div>
 
       <el-form-item prop="username">
@@ -43,7 +43,7 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
-      <div class="tips"><span>2024 © Power By 信息技术处 使用chrome获得最佳体验</span></div>
+      <div class="tips"><span>2024 © Power By IT&运维 使用chrome获得最佳体验</span></div>
 
     </el-form>
   </div>

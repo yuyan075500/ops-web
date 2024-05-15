@@ -11,22 +11,7 @@
         active-color="#13ce66"
         inactive-color="#ff4949"
       />
-      <div class="help-block" style="color: #999; font-size: 12px">仅角色分组支持角色权限分配，创建后不允许修改</div>
-    </el-form-item>
-    <el-form-item v-if="form.is_role_group == true" label="分组用户：">
-      <el-transfer
-        v-model="form.users"
-        style="text-align: left;display: inline-block"
-        filterable
-        filter-placeholder="请输入用户姓名"
-        :titles="['可选用户', '已选用户']"
-        :button-texts="['移除', '加入']"
-        :format="{
-          noChecked: '${total}',
-          hasChecked: '${checked}/${total}'
-        }"
-        :data="userList"
-      />
+      <div class="help-block" style="color: #999; font-size: 12px">仅<b>角色分组</b>支持权限分配，创建后不支持修改</div>
     </el-form-item>
     <el-form-item>
       <div>
@@ -46,17 +31,16 @@ export default {
       default() {
         return {
           name: '',
-          is_role_group: false,
-          users: [] // 已选用户列表
+          is_role_group: false
         }
       }
     },
     loading: {
       type: Boolean
     },
-    // 可选用户列表
-    groupList: {
-      type: Array,
+    // 穿梭框数据
+    transferData: {
+      type: Object,
       default() {
         return {}
       }
@@ -65,7 +49,6 @@ export default {
   },
   data() {
     return {
-      users: '',
       rules: {
         name: [
           { required: true, message: '请输入分组名称', trigger: 'change' }

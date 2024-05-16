@@ -3,8 +3,8 @@
 
     <!-- 表格搜索 -->
     <el-form :inline="true">
-      <el-form-item label="分组名">
-        <el-input v-model="queryParams.name" placeholder="分组名称" size="small" prefix-icon="el-icon-search" clearable style="width: 320px" />
+      <el-form-item label="分组名：">
+        <el-input v-model="queryParams.name" size="small" prefix-icon="el-icon-search" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="searchList">查询</el-button>

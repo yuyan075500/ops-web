@@ -55,10 +55,21 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      expandRows: []
+    }
+  },
   methods: {
 
     /* 编辑按钮 */
     handleEdit(value) {
+      // type=0表示为一级菜单，type=1表示为二级菜单
+      if (value.menu_id == null) {
+        value['type'] = 0
+      } else {
+        value['type'] = 1
+      }
       this.$emit('edit', value)
     },
 

@@ -64,11 +64,11 @@
       :title="formTitle"
       :visible.sync="userDialog"
       :show-close="false"
-      width="800px"
+      width="850px"
       :close-on-click-modal="false"
       @close="handleClose"
     >
-      <add-user-transfer :form="currentValue" :transfer-data="transferData" @close="handleClose" @submit="handleUserSubmit" />
+      <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" @close="handleClose" @submit="handleUserSubmit" />
     </el-dialog>
   </div>
 </template>
@@ -92,7 +92,7 @@ export default {
       loading: true,
       tableData: [],
       total: 0,
-      formTitle: undefined,
+      formTitle: '',
       currentValue: undefined,
       transferData: {
         leftData: [],
@@ -129,6 +129,18 @@ export default {
       })
     },
 
+    /* page size变化 */
+    handlePageSizeChange(newSize) {
+      this.queryParams.page_size = newSize
+      this.getList()
+    },
+
+    /* page number的变化 */
+    handlePageChange(newPage) {
+      this.queryParams.page = newPage
+      this.getList()
+    },
+
     // 获取所有用户
     getUserList() {
       getUserListAll().then((res) => {
@@ -140,18 +152,6 @@ export default {
           })
         }
       })
-    },
-
-    /* page size变化 */
-    handlePageSizeChange(newSize) {
-      this.queryParams.page_size = newSize
-      this.getList()
-    },
-
-    /* page number的变化 */
-    handlePageChange(newPage) {
-      this.queryParams.page = newPage
-      this.getList()
     },
 
     /* 新增分组 */

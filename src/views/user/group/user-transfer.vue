@@ -1,6 +1,6 @@
 <template>
   <el-form ref="form" :model="form" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%" size="small">
-    <el-form-item label="分组用户：">
+    <el-form-item>
       <el-transfer
         v-model="transferData.rightData"
         style="text-align: left;display: inline-block"

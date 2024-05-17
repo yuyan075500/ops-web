@@ -43,3 +43,12 @@ export function changeGroupUser(data) {
     data
   })
 }
+
+// 分组权限管理
+export function changeGroupPermission(data) {
+  return request({
+    url: '/api/v1/group/permissions',
+    method: 'put',
+    data
+  })
+}

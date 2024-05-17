@@ -24,6 +24,7 @@
       :table-data="tableData"
       @edit="handleEditGroup"
       @user="handleEditUser"
+      @permission="handlePermission"
       @delete="handleDelete"
       @active="handleSubmit"
     />
@@ -70,22 +71,37 @@
     >
       <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" @close="handleClose" @submit="handleUserSubmit" />
     </el-dialog>
+
+    <!-- 权限管理 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="permissionDialog"
+      :show-close="false"
+      width="850px"
+      :close-on-click-modal="false"
+      @close="handleClose"
+    >
+      <add-permission-tree :tree-data="permissionData" :form="currentValue" @close="handleClose" @submit="handlePermissionSubmit" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui'
-import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser } from '@/api/user/group'
+import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser, changeGroupPermission } from '@/api/user/group'
 import { getUserListAll } from '@/api/user/user'
+import { getMenuListAll } from '@/api/system/menu'
 import GroupListTable from './table'
 import GroupAddForm from './form'
 import AddUserTransfer from './user-transfer'
+import AddPermissionTree from './permission'
 
 export default {
   components: {
     GroupListTable,
     GroupAddForm,
-    AddUserTransfer
+    AddUserTransfer,
+    AddPermissionTree
   },
   data() {
     return {
@@ -98,19 +114,25 @@ export default {
         leftData: [],
         rightData: []
       },
+      permissionData: {
+        data: [],
+        selectData: []
+      },
       queryParams: {
         name: '',
         page: 1,
         limit: 15
       },
       groupAddDialog: false,
-      userDialog: false
+      userDialog: false,
+      permissionDialog: false
 
     }
   },
   created() {
     this.getList()
     this.getUserList()
+    this.getMenuList()
   },
   methods: {
     /* 查找数据 */
@@ -154,6 +176,29 @@ export default {
       })
     },
 
+    // 获取所有菜单
+    getMenuList() {
+      getMenuListAll().then((res) => {
+        const data = res.data.items
+        for (let i = 0; i < data.length; i++) {
+          const item = data[i]
+          const menu = {
+            name: item.name,
+            label: item.title
+          }
+
+          if (item.SubMenus) {
+            menu.children = item.SubMenus.map(subItem => ({
+              name: subItem.name,
+              label: subItem.title
+            }))
+          }
+
+          this.permissionData.data.push(menu)
+        }
+      })
+    },
+
     /* 新增分组 */
     handleAddGroup() {
       // 打开Dialog
@@ -186,11 +231,22 @@ export default {
       }
     },
 
+    /* 管理角色权限 */
+    handlePermission(rowData) {
+      // 显示弹框
+      this.permissionDialog = true
+      // 更改弹框标题
+      this.formTitle = '权限管理'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
       this.groupAddDialog = false
       this.userDialog = false
+      this.permissionDialog = false
       // 清空表单及空梭框数据
       this.currentValue = undefined
       this.transferData.rightData = []
@@ -238,8 +294,25 @@ export default {
     /* 分组用户修改 */
     handleUserSubmit(formData) {
       this.loading = true
-      console.log(formData)
       changeGroupUser(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
+    /* 分组权限修改 */
+    handlePermissionSubmit(formData) {
+      this.loading = true
+      changeGroupPermission(formData).then((res) => {
         if (res.code === 0) {
           Message({
             message: res.msg,

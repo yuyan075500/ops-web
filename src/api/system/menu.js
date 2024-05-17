@@ -8,3 +8,11 @@ export function getMenuList(params) {
     params
   })
 }
+
+// 获取所有菜单
+export function getMenuListAll() {
+  return request({
+    url: '/api/v1/menu/list',
+    method: 'get'
+  })
+}

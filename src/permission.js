@@ -1,6 +1,5 @@
 import router from './router'
 import store from './store'
-import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // 从cookie获取token
@@ -55,7 +54,6 @@ router.beforeEach(async(to, from, next) => {
         } catch (error) {
           // 移除token并回到登录页面
           await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
           next(`/login?redirect=${to.path}`)
           NProgress.done()
         }

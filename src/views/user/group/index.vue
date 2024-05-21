@@ -69,7 +69,7 @@
       :close-on-click-modal="false"
       @close="handleClose"
     >
-      <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" @close="handleClose" @submit="handleUserSubmit" />
+      <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" :loading="loading" @close="handleClose" @submit="handleUserSubmit" />
     </el-dialog>
 
     <!-- 权限管理 -->
@@ -81,7 +81,7 @@
       :close-on-click-modal="false"
       @close="handleClose"
     >
-      <add-permission-tree :tree-data="permissionData" :form="currentValue" @close="handleClose" @submit="handlePermissionSubmit" />
+      <add-permission-tree ref="form" :tree-data="permissionData" :form="currentValue" :loading="loading" @close="handleClose" @submit="handlePermissionSubmit" />
     </el-dialog>
   </div>
 </template>
@@ -227,7 +227,7 @@ export default {
       this.currentValue = JSON.parse(JSON.stringify(rowData))
       // 定义分组已存在用户列表
       for (let i = 0; i < rowData.users.length; i++) {
-        this.transferData.rightData.push(rowData.users[i].ID)
+        this.transferData.rightData.push(rowData.users[i].id)
       }
     },
 
@@ -239,6 +239,10 @@ export default {
       this.formTitle = '权限管理'
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
+      // 手动设置勾选的节点，确保选中的节点正确
+      this.$nextTick(() => {
+        this.$refs.form.$refs.tree.setCheckedKeys(this.currentValue.menus)
+      })
     },
 
     /* 表单关闭 */
@@ -250,6 +254,8 @@ export default {
       // 清空表单及空梭框数据
       this.currentValue = undefined
       this.transferData.rightData = []
+      // 关闭loading状态
+      this.loading = false
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

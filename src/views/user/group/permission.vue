@@ -11,6 +11,7 @@
               default-expand-all
               node-key="name"
               highlight-current
+              :default-checked-keys="form.menus"
               :expand-on-click-node="false"
               :check-on-click-node="true"
               :data="treeData.data"
@@ -56,7 +57,7 @@ export default {
       const checkedKeys = this.$refs.tree.getCheckedKeys()
       // 所有选中子节点的父节点key
       const halfCheckedKeys = this.$refs.tree.getHalfCheckedKeys()
-      // 组合
+      // 节点key合并
       const data = {
         'id': this.form.id,
         'permissions': checkedKeys.concat(halfCheckedKeys)

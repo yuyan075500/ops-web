@@ -11,6 +11,7 @@
               default-expand-all
               node-key="name"
               highlight-current
+              :check-strictly="checkStrictly"
               :default-checked-keys="form.menus"
               :expand-on-click-node="false"
               :check-on-click-node="true"
@@ -42,6 +43,9 @@ export default {
     loading: {
       type: Boolean
     },
+    checkStrictly: {
+      type: Boolean
+    },
     treeData: {
       type: Object,
       default: function() {
@@ -49,18 +53,18 @@ export default {
       }
     }
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.$emit('strictly')
+    })
+  },
   methods: {
 
     /* 提交表单 */
     handleSubmit() {
-      // 所有选中子节点的key
-      const checkedKeys = this.$refs.tree.getCheckedKeys()
-      // 所有选中子节点的父节点key
-      const halfCheckedKeys = this.$refs.tree.getHalfCheckedKeys()
-      // 节点key合并
       const data = {
         'id': this.form.id,
-        'permissions': checkedKeys.concat(halfCheckedKeys)
+        'permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
       }
       this.$emit('submit', data)
     },

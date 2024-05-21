@@ -74,14 +74,24 @@
 
     <!-- 权限管理 -->
     <el-dialog
+      v-if="permissionDialog"
+      width="850px"
       :title="formTitle"
       :visible.sync="permissionDialog"
       :show-close="false"
-      width="850px"
       :close-on-click-modal="false"
       @close="handleClose"
     >
-      <add-permission-tree ref="form" :tree-data="permissionData" :form="currentValue" :loading="loading" @close="handleClose" @submit="handlePermissionSubmit" />
+      <add-permission-tree
+        ref="form"
+        :tree-data="permissionData"
+        :form="currentValue"
+        :loading="loading"
+        :check-strictly="checkStrictly"
+        @strictly="handleStrictly"
+        @close="handleClose"
+        @submit="handlePermissionSubmit"
+      />
     </el-dialog>
   </div>
 </template>
@@ -114,6 +124,7 @@ export default {
         leftData: [],
         rightData: []
       },
+      checkStrictly: true,
       permissionData: {
         data: [],
         selectData: []
@@ -239,10 +250,17 @@ export default {
       this.formTitle = '权限管理'
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
+      // 配置父子菜单是否关联（true表示不关联）
+      this.checkStrictly = true
       // 手动设置勾选的节点，确保选中的节点正确
       this.$nextTick(() => {
         this.$refs.form.$refs.tree.setCheckedKeys(this.currentValue.menus)
       })
+    },
+
+    /* 更改角色权限管理中父子菜单是否关联（false表示关联） */
+    handleStrictly() {
+      this.checkStrictly = false
     },
 
     /* 表单关闭 */

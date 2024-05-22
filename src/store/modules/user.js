@@ -79,14 +79,19 @@ const actions = {
       getUserInfo().then(response => {
         if (response.code === 0) {
           const { data } = response
+          const { id, name, avatar, username, email, phone_number } = data
+          let { menus } = data
+
+          // 如果后端返回的菜单为null，则需要将变量menus更改为空数组，否则后面无法追加404路由，会导致用户登录后如何进入系统
+          if (menus === null) {
+            menus = []
+          }
 
           // 增加404路由到末尾
-          data.menus.push(
+          menus.push(
             { path: '/404', component: '404', hidden: true },
             { path: '*', redirect: '/404', hidden: true }
           )
-
-          const { id, name, avatar, username, email, phone_number, menus } = data
 
           // 将用户信息存储到vuex中
           commit('SET_NAME', name)

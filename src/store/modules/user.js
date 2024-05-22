@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo, getUserMenu } from '@/api/user'
+import { login, logout, getUserInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -79,7 +79,14 @@ const actions = {
       getUserInfo().then(response => {
         if (response.code === 0) {
           const { data } = response
-          const { id, name, avatar, username, email, phone_number } = data
+
+          // 增加404路由到末尾
+          data.menus.push(
+            { path: '/404', component: '404', hidden: true },
+            { path: '*', redirect: '/404', hidden: true }
+          )
+
+          const { id, name, avatar, username, email, phone_number, menus } = data
 
           // 将用户信息存储到vuex中
           commit('SET_NAME', name)
@@ -88,27 +95,8 @@ const actions = {
           commit('SET_EMAIL', email)
           commit('SET_ID', id)
           commit('SET_PHONE_NUMBER', phone_number)
+          commit('SET_MENUS', menus)
           resolve(data)
-        }
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-
-  // 获取用户菜单
-  getMenu({ commit }) {
-    return new Promise((resolve, reject) => {
-      getUserMenu().then(response => {
-        if (response.code === 0) {
-          // 增加404路由到末尾
-          response.data.push(
-            { path: '/404', component: '404', hidden: true },
-            { path: '*', redirect: '/404', hidden: true }
-          )
-          // 将用户路由信息存储到vuex中
-          commit('SET_MENUS', response.data)
-          resolve(response)
         }
       }).catch(error => {
         reject(error)

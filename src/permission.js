@@ -38,9 +38,6 @@ router.beforeEach(async(to, from, next) => {
           // 获取用户信息
           await store.dispatch('user/getInfo')
 
-          // 获取用户菜单
-          await store.dispatch('user/getMenu')
-
           // 生成用户菜单
           if (store.getters.menus.length < 1) {
             global.antRouter = []

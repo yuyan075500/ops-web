@@ -24,11 +24,3 @@ export function getUserInfo() {
     method: 'get'
   })
 }
-
-// 获取当前登录的用户菜单
-export function getUserMenu() {
-  return request({
-    url: '/api/v1/user/menu',
-    method: 'get'
-  })
-}

@@ -19,7 +19,7 @@ const getDefaultState = () => {
     // ID
     id: '',
     // 菜单
-    menu: []
+    menus: []
   }
 }
 

@@ -12,21 +12,8 @@
   >
     <el-table-column type="expand" width="40">
       <template slot-scope="props">
-        <el-table :data="tableData[props.$index].SubMenus" tooltip-effect="dark" style="width: 100%; margin-top:10px;" size="mini" border>
-          <el-table-column type="selection" width="40" />
-          <el-table-column prop="title" label="title" min-width="4%" />
-          <el-table-column prop="name" label="name" min-width="6%" />
-          <el-table-column prop="icon" label="icon" min-width="5%" />
-          <el-table-column prop="path" label="path" min-width="10%" />
-          <el-table-column prop="component" label="component" min-width="10%" />
-          <el-table-column prop="sort" label="排序" min-width="3%" align="center" />
-          <el-table-column label="操作" min-width="10%" align="center">
-            <template slot-scope="scope">
-              <el-button size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
-              <el-button size="mini" type="text" @click="handleDelete(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <!-- 二级菜单 -->
+        <sub-menu-list-table :table-data="tableData[props.$index].SubMenus" />
       </template>
     </el-table-column>
     <el-table-column prop="title" label="title" min-width="4%" />
@@ -45,8 +32,13 @@
 </template>
 
 <script>
+import SubMenuListTable from './sub-menu'
+
 export default {
   name: 'MenuListTable',
+  components: {
+    SubMenuListTable
+  },
   props: {
     tableData: {
       type: Array,

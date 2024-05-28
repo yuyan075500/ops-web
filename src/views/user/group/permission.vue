@@ -2,21 +2,45 @@
   <div>
     <el-form ref="form" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%" size="small">
       <el-form-item>
-        <el-row>
+        <el-row :gutter="10">
           <el-col :span="8">
-            <!-- 树形菜单 -->
-            <el-tree
-              ref="tree"
-              show-checkbox
-              default-expand-all
-              node-key="name"
-              highlight-current
-              :check-strictly="checkStrictly"
-              :default-checked-keys="form.menus"
-              :expand-on-click-node="false"
-              :check-on-click-node="true"
-              :data="treeData.data"
-            />
+            <el-card class="box-card" shadow="hover">
+              <div slot="header" class="clearfix">
+                <span>菜单权限</span>
+              </div>
+              <!-- 树形菜单 -->
+              <div class="down-tree">
+                <el-tree
+                  ref="tree"
+                  show-checkbox
+                  default-expand-all
+                  node-key="name"
+                  highlight-current
+                  :check-strictly="checkStrictly"
+                  :default-checked-keys="form.menus"
+                  :expand-on-click-node="false"
+                  :check-on-click-node="true"
+                  :data="treeData.data"
+                />
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="16">
+            <el-card class="box-card" shadow="hover">
+              <div slot="header" class="clearfix">
+                <span>接口权限</span>
+              </div>
+              <div class="down-tree">
+                <ul class="item">
+                  <li v-for="(item, index) in checkData" :key="index">
+                    <el-checkbox v-model="item.flag" :indeterminate="isIndeterminate(item)" @change="(val) => handleCheckAll(val, item)">{{ item.menu_name }}</el-checkbox>
+                    <el-checkbox-group v-model="selectedData" class="checkbox-group" @change="handleChange(item)">
+                      <el-checkbox v-for="path in item.paths" :key="path.id" :label="path.name" class="checkbox-group-item">{{ path.description }}</el-checkbox>
+                    </el-checkbox-group>
+                  </li>
+                </ul>
+              </div>
+            </el-card>
           </el-col>
         </el-row>
       </el-form-item>
@@ -31,6 +55,8 @@
 </template>
 
 <script>
+import { getPathListAll } from '@/api/system/path'
+
 export default {
   name: 'AddPermissionTree',
   props: {
@@ -53,20 +79,68 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      checkData: [], // 筛选框数据
+      selectedData: [] // 筛选框选中的数据
+    }
+  },
   mounted() {
     this.$nextTick(() => {
       this.$emit('strictly')
     })
   },
+  created() {
+    this.getList()
+  },
   methods: {
+
+    /* 获取接口权限 */
+    getList() {
+      getPathListAll().then((res) => {
+        this.checkData = res.data
+      })
+    },
+
+    // 全选&&全部取消
+    handleCheckAll(val, item) {
+      // 过滤掉没有选中的数据，item.child中不包含v时返回-1
+      const next = item.paths.map(item => item.name)
+      const filterArr = this.selectedData.filter(
+        (v) => next.indexOf(v) === -1
+      )
+      this.selectedData = val ? filterArr.concat(next) : filterArr
+    },
+
+    // 筛选框勾选时状态变化
+    handleChange(val) {
+      const infoLists = val.paths.map(ite => ite.name)
+      infoLists.every((v) => {
+        if (this.selectedData.indexOf(v) > -1) {
+          val.flag = true
+        } else {
+          val.flag = false
+        }
+      })
+    },
+
+    // 判断是否为全选状态
+    isIndeterminate(item) {
+      const infoLists = item.paths.map(ite => ite.name)
+      return (
+        infoLists.some((v) => this.selectedData.indexOf(v) > -1) &&
+        !infoLists.every((v) => this.selectedData.indexOf(v) > -1)
+      )
+    },
 
     /* 提交表单 */
     handleSubmit() {
-      const data = {
-        'id': this.form.id,
-        'permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
-      }
-      this.$emit('submit', data)
+      console.log(this.selectedData)
+      // const data = {
+      //   'id': this.form.id,
+      //   'permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
+      // }
+      // this.$emit('submit', data)
     },
 
     /* 关闭表单 */
@@ -76,3 +150,23 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.down-tree{
+  height: 250px;
+  display: block;
+  overflow-y: auto;
+}
+.item{
+  list-style-type: none; /* 不显示圆点 */
+  padding-left: 20px;
+}
+.checkbox-group{
+  /* 指定分组中元素缩进像素 */
+  padding-left: 30px;
+}
+.checkbox-group-item{
+  /* 指定分组中每个筛选框的宽度 */
+  width: 100px;
+}
+</style>

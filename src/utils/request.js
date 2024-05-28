@@ -63,7 +63,7 @@ service.interceptors.response.use(
   error => {
     // HTTP状态码非200的请求处理
     Message({
-      message: error.msg,
+      message: error.response.data.msg || '未知的错误请求，请联系管理员',
       type: 'error',
       duration: 2 * 1000
     })

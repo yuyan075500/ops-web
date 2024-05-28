@@ -75,7 +75,7 @@
     <!-- 权限管理 -->
     <el-dialog
       v-if="permissionDialog"
-      width="850px"
+      width="1000px"
       :title="formTitle"
       :visible.sync="permissionDialog"
       :show-close="false"

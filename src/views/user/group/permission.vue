@@ -135,12 +135,12 @@ export default {
 
     /* 提交表单 */
     handleSubmit() {
-      console.log(this.selectedData)
-      // const data = {
-      //   'id': this.form.id,
-      //   'permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
-      // }
-      // this.$emit('submit', data)
+      const data = {
+        'id': this.form.id,
+        'menu_permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys()),
+        'path_permissions': this.selectedData
+      }
+      this.$emit('submit', data)
     },
 
     /* 关闭表单 */

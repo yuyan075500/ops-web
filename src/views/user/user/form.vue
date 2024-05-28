@@ -3,12 +3,12 @@
     <el-row>
       <el-col :span="12">
         <el-form-item label="用户名：" prop="username">
-          <el-input v-model="form.username" autocomplete="off" clearable />
+          <el-input v-model="form.username" autocomplete="off" :disabled="form.id !== undefined" clearable />
         </el-form-item>
       </el-col>
       <el-col :span="12">
         <el-form-item label="姓名：" prop="name">
-          <el-input v-model="form.name" autocomplete="off" clearable />
+          <el-input v-model="form.name" autocomplete="off" :disabled="form.id !== undefined" clearable />
         </el-form-item>
       </el-col>
     </el-row>

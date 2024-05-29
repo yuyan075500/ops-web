@@ -34,7 +34,7 @@
                 <ul class="item">
                   <li v-for="(item, index) in checkData" :key="index">
                     <el-checkbox v-model="item.flag" :indeterminate="isIndeterminate(item)" @change="(val) => handleCheckAll(val, item)">{{ item.menu_name }}</el-checkbox>
-                    <el-checkbox-group v-model="selectedData" class="checkbox-group" @change="handleChange(item)">
+                    <el-checkbox-group v-model="form.paths" class="checkbox-group" @change="handleChange(item)">
                       <el-checkbox v-for="path in item.paths" :key="path.id" :label="path.name" class="checkbox-group-item">{{ path.description }}</el-checkbox>
                     </el-checkbox-group>
                   </li>
@@ -81,8 +81,7 @@ export default {
   },
   data() {
     return {
-      checkData: [], // 筛选框数据
-      selectedData: [] // 筛选框选中的数据
+      checkData: []
     }
   },
   mounted() {
@@ -106,17 +105,17 @@ export default {
     handleCheckAll(val, item) {
       // 过滤掉没有选中的数据，item.child中不包含v时返回-1
       const next = item.paths.map(item => item.name)
-      const filterArr = this.selectedData.filter(
+      const filterArr = this.form.paths.filter(
         (v) => next.indexOf(v) === -1
       )
-      this.selectedData = val ? filterArr.concat(next) : filterArr
+      this.form.paths = val ? filterArr.concat(next) : filterArr
     },
 
     // 筛选框勾选时状态变化
     handleChange(val) {
       const infoLists = val.paths.map(ite => ite.name)
       infoLists.every((v) => {
-        if (this.selectedData.indexOf(v) > -1) {
+        if (this.form.paths.indexOf(v) > -1) {
           val.flag = true
         } else {
           val.flag = false
@@ -128,8 +127,8 @@ export default {
     isIndeterminate(item) {
       const infoLists = item.paths.map(ite => ite.name)
       return (
-        infoLists.some((v) => this.selectedData.indexOf(v) > -1) &&
-        !infoLists.every((v) => this.selectedData.indexOf(v) > -1)
+        infoLists.some((v) => this.form.paths.indexOf(v) > -1) &&
+        !infoLists.every((v) => this.form.paths.indexOf(v) > -1)
       )
     },
 
@@ -138,7 +137,7 @@ export default {
       const data = {
         'id': this.form.id,
         'menu_permissions': this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys()),
-        'path_permissions': this.selectedData
+        'path_permissions': this.form.paths
       }
       this.$emit('submit', data)
     },

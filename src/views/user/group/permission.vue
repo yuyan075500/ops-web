@@ -80,11 +80,6 @@ export default {
       menuData: []
     }
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.$emit('strictly')
-    })
-  },
   created() {
     this.getMenuList()
     this.getList()
@@ -117,9 +112,12 @@ export default {
           }
           this.menuData.push(menu)
         }
-        // 设置选中的菜单
+
         this.$nextTick(() => {
+          // 设置选中的菜单
           this.$refs.tree.setCheckedKeys(this.form.menus)
+          // 设置父子菜单关联关系
+          this.$emit('strictly')
         })
       })
     },

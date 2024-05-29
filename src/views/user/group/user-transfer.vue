@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { getUserListAll } from '@/api/user/user'
+
 export default {
   name: 'AddUserTransfer',
   props: {
@@ -46,7 +48,23 @@ export default {
     }
 
   },
+  created() {
+    this.getUserList()
+  },
   methods: {
+
+    // 获取所有用户
+    getUserList() {
+      getUserListAll().then((res) => {
+        const data = res.data.users
+        for (let i = 0; i < data.length; i++) {
+          this.transferData.leftData.push({
+            label: data[i].name,
+            key: data[i].id
+          })
+        }
+      })
+    },
 
     /* 提交表单 */
     handleSubmit() {

@@ -75,7 +75,7 @@
     <!-- 权限管理 -->
     <el-dialog
       v-if="permissionDialog"
-      width="1000px"
+      width="1200px"
       :title="formTitle"
       :visible.sync="permissionDialog"
       :show-close="false"
@@ -84,7 +84,6 @@
     >
       <add-permission-tree
         ref="form"
-        :tree-data="permissionData"
         :form="currentValue"
         :loading="loading"
         :check-strictly="checkStrictly"
@@ -99,8 +98,6 @@
 <script>
 import { Message } from 'element-ui'
 import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser, changeGroupPermission } from '@/api/user/group'
-import { getUserListAll } from '@/api/user/user'
-import { getMenuListAll } from '@/api/system/menu'
 import GroupListTable from './table'
 import GroupAddForm from './form'
 import AddUserTransfer from './user-transfer'
@@ -125,10 +122,6 @@ export default {
         rightData: []
       },
       checkStrictly: true,
-      permissionData: {
-        data: [],
-        selectData: []
-      },
       queryParams: {
         name: '',
         page: 1,
@@ -142,8 +135,6 @@ export default {
   },
   created() {
     this.getList()
-    this.getUserList()
-    this.getMenuList()
   },
   methods: {
     /* 查找数据 */
@@ -172,42 +163,6 @@ export default {
     handlePageChange(newPage) {
       this.queryParams.page = newPage
       this.getList()
-    },
-
-    // 获取所有用户
-    getUserList() {
-      getUserListAll().then((res) => {
-        const data = res.data.users
-        for (let i = 0; i < data.length; i++) {
-          this.transferData.leftData.push({
-            label: data[i].name,
-            key: data[i].id
-          })
-        }
-      })
-    },
-
-    // 获取所有菜单
-    getMenuList() {
-      getMenuListAll().then((res) => {
-        const data = res.data.items
-        for (let i = 0; i < data.length; i++) {
-          const item = data[i]
-          const menu = {
-            name: item.name,
-            label: item.title
-          }
-
-          if (item.SubMenus) {
-            menu.children = item.SubMenus.map(subItem => ({
-              name: subItem.name,
-              label: subItem.title
-            }))
-          }
-
-          this.permissionData.data.push(menu)
-        }
-      })
     },
 
     /* 新增分组 */
@@ -252,10 +207,6 @@ export default {
       this.currentValue = JSON.parse(JSON.stringify(rowData))
       // 配置父子菜单是否关联（true表示不关联）
       this.checkStrictly = true
-      // 手动设置勾选的节点，确保选中的节点正确
-      this.$nextTick(() => {
-        this.$refs.form.$refs.tree.setCheckedKeys(this.currentValue.menus)
-      })
     },
 
     /* 更改角色权限管理中父子菜单是否关联（false表示关联） */

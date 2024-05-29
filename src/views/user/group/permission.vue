@@ -20,7 +20,7 @@
                   :default-checked-keys="form.menus"
                   :expand-on-click-node="false"
                   :check-on-click-node="true"
-                  :data="treeData.data"
+                  :data="menuData"
                 />
               </div>
             </el-card>
@@ -56,6 +56,7 @@
 
 <script>
 import { getPathListAll } from '@/api/system/path'
+import { getMenuListAll } from '@/api/system/menu'
 
 export default {
   name: 'AddPermissionTree',
@@ -71,17 +72,12 @@ export default {
     },
     checkStrictly: {
       type: Boolean
-    },
-    treeData: {
-      type: Object,
-      default: function() {
-        return []
-      }
     }
   },
   data() {
     return {
-      checkData: []
+      checkData: [],
+      menuData: []
     }
   },
   mounted() {
@@ -90,6 +86,7 @@ export default {
     })
   },
   created() {
+    this.getMenuList()
     this.getList()
   },
   methods: {
@@ -98,6 +95,32 @@ export default {
     getList() {
       getPathListAll().then((res) => {
         this.checkData = res.data
+      })
+    },
+
+    // 获取所有菜单
+    getMenuList() {
+      getMenuListAll().then((res) => {
+        const data = res.data.items
+        for (let i = 0; i < data.length; i++) {
+          const item = data[i]
+          const menu = {
+            name: item.name,
+            label: item.title
+          }
+
+          if (item.SubMenus) {
+            menu.children = item.SubMenus.map(subItem => ({
+              name: subItem.name,
+              label: subItem.title
+            }))
+          }
+          this.menuData.push(menu)
+        }
+        // 设置选中的菜单
+        this.$nextTick(() => {
+          this.$refs.tree.setCheckedKeys(this.form.menus)
+        })
       })
     },
 
@@ -152,7 +175,7 @@ export default {
 
 <style scoped>
 .down-tree{
-  height: 250px;
+  height: 300px;
   display: block;
   overflow-y: auto;
 }
@@ -166,6 +189,6 @@ export default {
 }
 .checkbox-group-item{
   /* 指定分组中每个筛选框的宽度 */
-  width: 100px;
+  width: 150px;
 }
 </style>

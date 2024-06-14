@@ -113,11 +113,14 @@ export default {
         }
 
         // 获取出表单中的数据
-        const { id, phone_number, email, is_active } = this.form
+        const { id, username, password, phone_number, email, name, is_active } = this.form
         const data = {
           'id': id,
+          'username': username,
+          'password': password,
           'phone_number': phone_number.toString(),
           'email': email,
+          'name': name,
           'is_active': is_active
         }
 

@@ -58,9 +58,9 @@ const mutations = {
 const actions = {
   // 用户登录
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { username, password, ldap } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: password, ldap: ldap }).then(response => {
         const { token } = response
         // 将token存储到vuex中
         commit('SET_TOKEN', token)

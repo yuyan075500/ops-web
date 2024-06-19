@@ -8,6 +8,12 @@ export const constantRoutes = [
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
+  },
+
+  {
+    path: '/reset_password',
+    component: () => import('@/views/account/reset_password/index'),
+    hidden: true
   }
 ]
 

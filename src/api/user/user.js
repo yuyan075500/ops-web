@@ -43,7 +43,7 @@ export function changeUser(data) {
   })
 }
 
-// 密码重置
+// 密码重置（管理员重置）
 export function resetPassword(data) {
   return request({
     url: '/api/v1/user/reset_password',
@@ -57,5 +57,14 @@ export function resetMFA(data) {
   return request({
     url: '/api/v1/user/reset_mfa/' + data.id,
     method: 'put'
+  })
+}
+
+// 获取校验码
+export function getVerificationCode(data) {
+  return request({
+    url: '/api/v1/sms/reset_password_code',
+    method: 'post',
+    data
   })
 }

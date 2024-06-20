@@ -35,7 +35,6 @@
           <div class="iconSize">密码复杂度要求如下：</div>
           <div class="iconSize">1、长度不少于10位</div>
           <div class="iconSize">2、必须包含大小写字母、数字和特殊符号，且每种类型字符的长度不小于2</div>
-          <div class="iconSize">3、不能与当前密码相同</div>
         </template>
       </el-alert>
     </el-form>
@@ -44,7 +43,7 @@
 
 <script>
 import { Message } from 'element-ui'
-import { getVerificationCode } from '@/api/user/user'
+import { getVerificationCode, resetPasswordSelf } from '@/api/user/user'
 
 export default {
   data() {
@@ -66,7 +65,6 @@ export default {
       buttonText: '获取校验码',
       totalTime: 60,
       isActive: false,
-      active: 0,
       loading: false,
       value: '提 交',
       form: {
@@ -153,6 +151,34 @@ export default {
             }
           })
         }
+      })
+    },
+
+    /* 表单提交 */
+    handleSubmit() {
+      resetPasswordSelf(this.form).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 5000,
+            showClose: true
+          })
+          this.value = '提 交'
+          this.loading = false
+          this.form = {
+            username: '',
+            phone_number: '',
+            code: '',
+            password: '',
+            re_password: ''
+          }
+          // 清空校验规则
+          this.$refs.form.resetFields()
+        }
+      }, () => {
+        this.value = '提 交'
+        this.loading = false
       })
     }
   }

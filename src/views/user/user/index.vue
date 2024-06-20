@@ -75,9 +75,9 @@
         :closable="false"
       >
         <template slot="title">
-          <div class="iconSize">为确保账号安全，设置的密码必须符合密码复杂度要求，要求如下：</div>
+          <div class="iconSize">密码复杂度要求如下：</div>
           <div class="iconSize">1、长度不少于10位</div>
-          <div class="iconSize">2、密码必须包含大小写字母、数据和特殊符号，并且每种类型的长度不小于2</div>
+          <div class="iconSize">2、必须包含大小写字母、数字和特殊符号，且每种类型字符的长度不小于2</div>
         </template>
       </el-alert>
       <!-- 表单组件 -->

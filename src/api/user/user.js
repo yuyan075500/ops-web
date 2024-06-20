@@ -68,3 +68,12 @@ export function getVerificationCode(data) {
     data
   })
 }
+
+// 密码重置（用户自助）
+export function resetPasswordSelf(data) {
+  return request({
+    url: '/api/v1/user/reset_password',
+    method: 'post',
+    data
+  })
+}

@@ -16,6 +16,9 @@
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAddUser">新增</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button type="primary" plain icon="el-icon-refresh" size="mini" @click="handleUserSync">AD域账号同步</el-button>
+      </el-col>
     </el-row>
 
     <!-- 表格组件 -->
@@ -94,7 +97,7 @@
 
 <script>
 import { Message } from 'element-ui'
-import { getUserList, addUser, changeUser, resetPassword, deleteUser, resetMFA } from '@/api/user/user'
+import { getUserList, addUser, changeUser, resetPassword, deleteUser, resetMFA, userSync } from '@/api/user/user'
 import UserListTable from './table'
 import UserAddForm from './form'
 import ResetUserPasswordForm from './reset-password-form'
@@ -196,6 +199,47 @@ export default {
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据
       this.getList()
+    },
+
+    /* AD域用户同步 */
+    handleUserSync() {
+      this.$confirm('点击确认将从AD中同步用户信息，你还可以了解更详细的同步规则。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        showClose: false,
+        closeOnClickModal: false,
+        dangerouslyUseHTMLString: true,
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '同步中...'
+            userSync().then((res) => {
+              if (res.code === 0) {
+                Message({
+                  message: res.msg,
+                  type: 'success',
+                  duration: 1000
+                })
+                instance.confirmButtonLoading = false
+                done()
+                // 获取最新数据
+                this.getList()
+              }
+            }).finally(() => {
+              instance.confirmButtonLoading = false
+              instance.confirmButtonText = '确定'
+            })
+          } else {
+            done()
+          }
+        }
+      }).then(() => {}).catch(() => {})
+    },
+
+    /* 打开用户同步规则 */
+    handleRuleDetails() {
+      console.log(1111)
     },
 
     /* 删除用户 */

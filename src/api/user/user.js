@@ -77,3 +77,11 @@ export function resetPasswordSelf(data) {
     data
   })
 }
+
+// AD域用户同步
+export function userSync() {
+  return request({
+    url: '/api/v1/user/sync',
+    method: 'post'
+  })
+}

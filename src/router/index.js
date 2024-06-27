@@ -11,6 +11,20 @@ export const constantRoutes = [
   },
 
   {
+    path: '/mfa',
+    name: 'MFA',
+    component: () => import('@/views/login/mfa'),
+    hidden: true
+  },
+
+  {
+    path: '/mfa_auth',
+    name: 'MFA_AUTH',
+    component: () => import('@/views/login/mfa_auth'),
+    hidden: true
+  },
+
+  {
     path: '/reset_password',
     component: () => import('@/views/account/reset_password/index'),
     hidden: true

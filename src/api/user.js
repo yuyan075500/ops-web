@@ -24,3 +24,21 @@ export function getUserInfo() {
     method: 'get'
   })
 }
+
+// 获取谷歌双因素认证二维码
+export function getGoogleQrcode(params) {
+  return request({
+    url: '/api/v1/user/mfa_qrcode',
+    method: 'get',
+    params
+  })
+}
+
+// 谷歌双因素认证
+export function mfaAuth(data) {
+  return request({
+    url: '/api/v1/user/mfa_auth',
+    method: 'post',
+    data
+  })
+}

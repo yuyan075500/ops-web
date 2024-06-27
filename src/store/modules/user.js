@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo } from '@/api/user'
+import { login, logout, getUserInfo, mfaAuth } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -67,6 +67,24 @@ const actions = {
         // 将token存储到cookie中
         setToken(token)
         resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  /* MFA认证 */
+  mfa_auth({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      mfaAuth(formData).then(response => {
+        const { token } = response
+        if (response.code === 0) {
+          // 将token存储到vuex中
+          commit('SET_TOKEN', token)
+          // 将token存储到cookie中
+          setToken(token)
+          resolve(response)
+        }
       }).catch(error => {
         reject(error)
       })

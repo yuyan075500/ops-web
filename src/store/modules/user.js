@@ -61,12 +61,18 @@ const actions = {
     const { username, password, ldap } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password, ldap: ldap }).then(response => {
-        const { token } = response
-        // 将token存储到vuex中
-        commit('SET_TOKEN', token)
-        // 将token存储到cookie中
-        setToken(token)
-        resolve()
+        const { token, redirect } = response
+
+        // 如果redirect不为undefined，则直接返回
+        if (redirect !== undefined) {
+          resolve(response)
+        } else {
+          // 将token存储到vuex中
+          commit('SET_TOKEN', token)
+          // 将token存储到cookie中
+          setToken(token)
+          resolve(response)
+        }
       }).catch(error => {
         reject(error)
       })

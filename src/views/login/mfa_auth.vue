@@ -1,22 +1,22 @@
 <template>
   <div class="mfa-container">
-    <el-form ref="formData" class="login-form" :model="formData" :rules="rules" validate-on-rule-change="false" label-position="left" label-width="110px">
+    <el-form ref="form" class="login-form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="left" label-width="110px">
 
       <div class="title-container">
         <h3 class="title">MFA认证</h3>
       </div>
 
-      <el-form-item label="动态验证码：" prop="mfa.code">
-        <el-input v-model="formData.mfa.code" placeholder="6位数字动态验证码" name="code" type="text" />
-        <div class="help-block" style="color: #999; font-size: 12px">请在输入动态验证码，您还剩余：{{ seconds }}s，倒计时结束请重新登录</div>
+      <el-form-item label="动态验证码：" prop="code">
+        <el-input v-model="form.code" placeholder="6位数字动态验证码" name="code" type="text" />
+        <div class="help-block" style="color: #999; font-size: 12px">请在输入动态验证码，还剩余：{{ seconds }}s，倒计时结束请重新登录</div>
       </el-form-item>
 
       <el-row>
         <el-col :span="12">
-          <el-button type="primary" style="width: 90%;margin-bottom: 20px" @click="handleBack()">重新登录</el-button>
+          <el-button type="primary" style="width: 90%;margin-bottom: 20px" @click="handleBack">重新登录</el-button>
         </el-col>
         <el-col :span="12">
-          <el-button type="primary" style="width: 90%;margin-bottom: 20px" :disabled="seconds === 0" @click="handleNext('formData')">登录</el-button>
+          <el-button type="primary" style="width: 90%;margin-bottom: 20px" :disabled="seconds === 0" @click="handleNext">登录</el-button>
         </el-col>
       </el-row>
 
@@ -39,21 +39,17 @@ export default {
   data() {
     return {
       src: '',
-      seconds: 300,
+      seconds: 120,
       redirect: undefined,
-      formData: {
-        mfa: {
-          code: '',
-          user_token_key: '',
-          mfa_secret: ''
-        }
+      form: {
+        code: '',
+        token: '',
+        username: ''
       },
       rules: {
-        mfa: {
-          code: [
-            { required: true, message: '请输入6位数字动态验证码', trigger: 'change' }
-          ]
-        }
+        code: [
+          { required: true, message: '请输入6位数字动态验证码', trigger: 'change' }
+        ]
       }
     }
   },
@@ -61,6 +57,8 @@ export default {
     $route: {
       handler: function(route) {
         this.redirect = route.query && route.query.redirect
+        this.form.token = this.$route.params.token
+        this.form.username = this.$route.params.username
       },
       immediate: true
     }
@@ -74,20 +72,13 @@ export default {
       }
     }, 1000)
   },
-  created() {
-    // 获取用户密码认证完成后返回的Token，页面刷新后会丢失（不能刷新页面）
-    this.formData.mfa.user_token_key = this.$route.params.user_token_key
-  },
   methods: {
     /* 登录 */
-    handleNext(formData) {
-      this.$refs[formData].validate((valid) => {
+    handleNext() {
+      this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$store.dispatch('user/mfa_login', this.formData.mfa).then((res) => {
+          this.$store.dispatch('user/mfa_auth', this.form).then((res) => {
             if (res.code === 0) {
-              if (res.data.redirect_url) {
-                window.location.href = res.data.redirect_url
-              }
               this.$router.push({ path: this.redirect || '/' })
             }
           }).catch(() => {})

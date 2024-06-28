@@ -11,9 +11,9 @@ export const constantRoutes = [
   },
 
   {
-    path: '/mfa',
-    name: 'MFA',
-    component: () => import('@/views/login/mfa'),
+    path: '/mfa_enable',
+    name: 'MFA_ENABLE',
+    component: () => import('@/views/login/mfa_enable'),
     hidden: true
   },
 

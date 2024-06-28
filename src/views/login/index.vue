@@ -120,8 +120,21 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          this.$store.dispatch('user/login', this.loginForm).then((res) => {
+            if (res.redirect !== undefined) {
+              this.$router.push({
+                name: res.redirect,
+                params: {
+                  token: res.token,
+                  username: this.loginForm.username
+                },
+                query: {
+                  redirect: this.redirect
+                }
+              })
+            } else {
+              this.$router.push({ path: this.redirect || '/' })
+            }
             this.loading = false
           }).catch(() => {
             this.loading = false

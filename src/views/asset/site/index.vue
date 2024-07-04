@@ -14,7 +14,7 @@
     <!-- 表格头 -->
     <el-row :gutter="10">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini">新增</el-button>
+        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAddGroup">新增分组</el-button>
       </el-col>
     </el-row>
 
@@ -22,6 +22,8 @@
     <group-table
       v-loading="loading"
       :table-data="tableData"
+      @edit-group="handleEditGroup"
+      @delete-group="handleDeleteGroup"
     />
 
     <!-- 分页 -->
@@ -35,28 +37,51 @@
       @size-change="handlePageSizeChange"
       @current-change="handlePageChange"
     />
+
+    <!-- 添加站点组 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="groupAddDialog"
+      :show-close="false"
+      :close-on-click-modal="false"
+      width="500px"
+      @close="handleClose"
+    >
+      <group-add-form
+        ref="form"
+        :loading="loading"
+        :form="currentValue"
+        @close="handleClose"
+        @submit="handleGroupSubmit"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getGroupList } from '@/api/asset/site'
+import { Message } from 'element-ui'
+import { getGroupList, deleteGroup, addGroup, changeGroup } from '@/api/asset/site'
 import GroupTable from './table'
+import GroupAddForm from './form'
 
 export default {
   components: {
-    GroupTable
+    GroupTable,
+    GroupAddForm
   },
   data() {
     return {
       loading: true,
       total: 0,
-      formTitle: '',
+      formTitle: undefined,
+      currentValue: undefined,
       tableData: [],
       queryParams: {
         name: '',
         page: 1,
         limit: 15
-      }
+      },
+      groupAddDialog: false
     }
   },
   created() {
@@ -89,6 +114,106 @@ export default {
     /* 监听page number的变化 */
     handlePageChange(newPage) {
       this.queryParams.page = newPage
+      this.getList()
+    },
+
+    /* 新增站点分组 */
+    handleAddGroup() {
+      // 打开Dialog
+      this.groupAddDialog = true
+      // 更改弹框标题
+      this.formTitle = '新增站点分组'
+    },
+
+    /* 修改站点分组 */
+    handleEditGroup(rowData) {
+      // 打开Dialog
+      this.groupAddDialog = true
+      // 更改Dialog标题
+      this.formTitle = '修改站点分组'
+      // // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
+    /* 删除站点 */
+    handleDeleteGroup(rowData) {
+      this.$confirm('点击确认当前站点将从系统中永久删除。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        showClose: false,
+        closeOnClickModal: false,
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '删除中...'
+            deleteGroup(rowData).then((res) => {
+              if (res.code === 0) {
+                Message({
+                  message: res.msg,
+                  type: 'success',
+                  duration: 1000
+                })
+                instance.confirmButtonLoading = false
+                done()
+                // 获取最新数据
+                this.getList()
+              }
+            }).finally(() => {
+              instance.confirmButtonLoading = false
+              instance.confirmButtonText = '确定'
+            })
+          } else {
+            done()
+          }
+        }
+      }).then(() => {}).catch(() => {})
+    },
+
+    /* 站点组新增与修改 */
+    handleGroupSubmit(formData) {
+      this.loading = true
+      // 对id进行判断，有id表示修改，没有表示新增
+      if (formData.id) {
+        changeGroup(formData).then((res) => {
+          if (res.code === 0) {
+            Message({
+              message: res.msg,
+              type: 'success',
+              duration: 1000
+            })
+            this.loading = false
+            this.handleClose()
+          }
+        }, () => {
+          this.loading = false
+        })
+      } else {
+        addGroup(formData).then((res) => {
+          if (res.code === 0) {
+            Message({
+              message: res.msg,
+              type: 'success',
+              duration: 1000
+            })
+            this.loading = false
+            this.handleClose()
+          }
+        }, () => {
+          this.loading = false
+        })
+      }
+    },
+
+    /* 表单关闭 */
+    handleClose() {
+      // 关闭所有Dialog
+      this.groupAddDialog = false
+      // 清空表单数据
+      this.currentValue = undefined
+      // 清空校验规则
+      this.$refs.form.$refs.form.resetFields()
+      // 获取最新数据
       this.getList()
     }
   }

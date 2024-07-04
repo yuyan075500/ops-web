@@ -85,12 +85,12 @@ export default {
   methods: {
     /* 编辑分组按钮 */
     handleGroupEdit(value) {
-      this.$emit('edit', value)
+      this.$emit('edit-group', value)
     },
 
     /* 编辑站点按钮 */
     handleSiteEdit(value) {
-      this.$emit('edit', value)
+      this.$emit('edit-site', value)
     },
 
     /* 显示站点详情 */
@@ -100,12 +100,12 @@ export default {
 
     /* 删除分组按钮 */
     handleGroupDelete(value) {
-      this.$emit('delete', value)
+      this.$emit('delete-group', value)
     },
 
     /* 删除站点按钮 */
     handleSiteDelete(value) {
-      this.$emit('delete', value)
+      this.$emit('delete-site', value)
     },
 
     /* 新增站点 */

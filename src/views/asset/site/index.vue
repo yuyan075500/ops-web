@@ -23,7 +23,11 @@
       v-loading="loading"
       :table-data="tableData"
       @edit-group="handleEditGroup"
+      @edit-site="handleEditSite"
+      @open="handleSiteSubmit"
       @delete-group="handleDeleteGroup"
+      @delete-site="handleDeleteSite"
+      @add="handleAddSite"
     />
 
     <!-- 分页 -->
@@ -38,7 +42,7 @@
       @current-change="handlePageChange"
     />
 
-    <!-- 添加站点组 -->
+    <!-- 添加站点分组 -->
     <el-dialog
       :title="formTitle"
       :visible.sync="groupAddDialog"
@@ -55,19 +59,41 @@
         @submit="handleGroupSubmit"
       />
     </el-dialog>
+
+    <!-- 添加站点 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="siteAddDialog"
+      :show-close="false"
+      :close-on-click-modal="false"
+      :destroy-on-close="true"
+      width="810px"
+      @close="handleClose"
+    >
+      <site-add-form
+        ref="form"
+        :loading="loading"
+        :form="currentValue"
+        :group="group"
+        @close="handleClose"
+        @submit="handleSiteSubmit"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui'
-import { getGroupList, deleteGroup, addGroup, changeGroup } from '@/api/asset/site'
+import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, deleteSite } from '@/api/asset/site'
 import GroupTable from './table'
 import GroupAddForm from './form'
+import SiteAddForm from './site-form'
 
 export default {
   components: {
     GroupTable,
-    GroupAddForm
+    GroupAddForm,
+    SiteAddForm
   },
   data() {
     return {
@@ -75,13 +101,15 @@ export default {
       total: 0,
       formTitle: undefined,
       currentValue: undefined,
+      group: NaN,
       tableData: [],
       queryParams: {
         name: '',
         page: 1,
         limit: 15
       },
-      groupAddDialog: false
+      groupAddDialog: false,
+      siteAddDialog: false
     }
   },
   created() {
@@ -125,19 +153,39 @@ export default {
       this.formTitle = '新增站点分组'
     },
 
+    /* 新增站点 */
+    handleAddSite(rowData) {
+      // 打开Dialog
+      this.siteAddDialog = true
+      // 更改弹框标题
+      this.formTitle = '新增站点'
+      // 赋值group
+      this.group = rowData.id
+    },
+
     /* 修改站点分组 */
     handleEditGroup(rowData) {
       // 打开Dialog
       this.groupAddDialog = true
       // 更改Dialog标题
       this.formTitle = '修改站点分组'
-      // // 将当前行数据赋值给currentValue
+      // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
 
-    /* 删除站点 */
+    /* 修改站点 */
+    handleEditSite(rowData) {
+      // 打开Dialog
+      this.siteAddDialog = true
+      // 更改Dialog标题
+      this.formTitle = '修改站点'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
+    /* 删除站点分组 */
     handleDeleteGroup(rowData) {
-      this.$confirm('点击确认当前站点将从系统中永久删除。', '提示', {
+      this.$confirm('点击确认当前站点分组将从系统中永久删除。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -148,6 +196,41 @@ export default {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '删除中...'
             deleteGroup(rowData).then((res) => {
+              if (res.code === 0) {
+                Message({
+                  message: res.msg,
+                  type: 'success',
+                  duration: 1000
+                })
+                instance.confirmButtonLoading = false
+                done()
+                // 获取最新数据
+                this.getList()
+              }
+            }).finally(() => {
+              instance.confirmButtonLoading = false
+              instance.confirmButtonText = '确定'
+            })
+          } else {
+            done()
+          }
+        }
+      }).then(() => {}).catch(() => {})
+    },
+
+    /* 删除站点 */
+    handleDeleteSite(rowData) {
+      this.$confirm('点击确认当前站点将从系统中永久删除。', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        showClose: false,
+        closeOnClickModal: false,
+        beforeClose: (action, instance, done) => {
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '删除中...'
+            deleteSite(rowData).then((res) => {
               if (res.code === 0) {
                 Message({
                   message: res.msg,
@@ -205,12 +288,49 @@ export default {
       }
     },
 
+    /* 站点新增与修改 */
+    handleSiteSubmit(formData) {
+      this.loading = true
+      // 对id进行判断，有id表示修改，没有表示新增
+      if (formData.id) {
+        changeSite(formData).then((res) => {
+          if (res.code === 0) {
+            Message({
+              message: res.msg,
+              type: 'success',
+              duration: 1000
+            })
+            this.loading = false
+            this.handleClose()
+          }
+        }, () => {
+          this.loading = false
+        })
+      } else {
+        addSite(formData).then((res) => {
+          if (res.code === 0) {
+            Message({
+              message: res.msg,
+              type: 'success',
+              duration: 1000
+            })
+            this.loading = false
+            this.handleClose()
+          }
+        }, () => {
+          this.loading = false
+        })
+      }
+    },
+
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
       this.groupAddDialog = false
+      this.siteAddDialog = false
       // 清空表单数据
       this.currentValue = undefined
+      this.group = NaN
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

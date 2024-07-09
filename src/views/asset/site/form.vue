@@ -1,6 +1,6 @@
 <template>
   <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%">
-    <el-form-item label="分组名称" prop="name">
+    <el-form-item label="分组名称：" prop="name">
       <el-input v-model="form.name" autocomplete="off" clearable />
     </el-form-item>
     <el-form-item>

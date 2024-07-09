@@ -18,13 +18,18 @@
           <el-table-column prop="icon" label="图标" min-width="2%" align="center">
             <template slot-scope="scope">
               <div class="site-icon">
-                <img :src="scope.row.icon">
+                <img v-if="scope.row.icon !== ''" :src="scope.row.icon">
+                <img v-else src="../../../assets/web.jpg">
               </div>
             </template>
           </el-table-column>
           <el-table-column prop="sso" label="统一认证" min-width="4%" align="center">
             <template slot-scope="scope">
-              <el-tag v-if="scope.row.sso" size="small">{{ scope.row.sso_type }}</el-tag>
+              <div v-if="scope.row.sso">
+                <el-tag v-if="scope.row.sso_type === 1" size="small">CAS3.0</el-tag>
+                <el-tag v-if="scope.row.sso_type === 2" size="small">OAuth2</el-tag>
+                <el-tag v-if="scope.row.sso_type === 3" size="small">SAML2</el-tag>
+              </div>
               <el-tag v-else type="danger" size="small">关闭</el-tag>
             </template>
           </el-table-column>

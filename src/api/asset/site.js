@@ -1,11 +1,19 @@
 import request from '@/utils/request'
 
-// 获取站点列表
+// 获取站点列表（表格）
 export function getGroupList(params) {
   return request({
     url: '/api/v1/sites',
     method: 'get',
     params
+  })
+}
+
+// 获取站点列表（站点导航）
+export function getSiteGuideList() {
+  return request({
+    url: '/api/v1/site/guide',
+    method: 'get'
   })
 }
 

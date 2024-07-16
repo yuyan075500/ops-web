@@ -25,8 +25,15 @@ export default {
     form: {
       type: Object,
       default() {
-        return {}
+        return {
+          password: '',
+          re_password: ''
+        }
       }
+    },
+    userId: {
+      type: Number,
+      default: NaN
     },
     loading: {
       type: Boolean
@@ -70,11 +77,10 @@ export default {
         if (!valid) {
           return
         }
-        const { id, password, re_password } = this.form
         const data = {
-          'id': id,
-          'password': password,
-          're_password': re_password
+          'id': this.userId,
+          'password': this.form.password,
+          're_password': this.form.re_password
         }
         this.$emit('submit', data)
       })

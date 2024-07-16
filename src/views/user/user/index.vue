@@ -87,6 +87,7 @@
       <reset-user-password-form
         ref="form"
         :form="currentValue"
+        :user-id="userId"
         :loading="loading"
         @close="handleClose"
         @submit="handleSubmit"
@@ -115,6 +116,7 @@ export default {
       total: 0,
       formTitle: undefined,
       currentValue: undefined,
+      userId: undefined,
       queryParams: {
         name: '',
         page: 1,
@@ -182,10 +184,10 @@ export default {
       this.formTitle = '重置用户密码'
       // 将当前行数据赋值给currentValue
       this.currentValue = {
-        'id': rowData.id,
         'password': '',
         're_password': ''
       }
+      this.userId = rowData.id
     },
 
     /* 表单关闭 */
@@ -195,6 +197,7 @@ export default {
       this.resetPasswordDialog = false
       // 清空表单数据
       this.currentValue = undefined
+      this.userId = undefined
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

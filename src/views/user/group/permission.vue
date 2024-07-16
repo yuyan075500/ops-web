@@ -16,11 +16,10 @@
                   default-expand-all
                   node-key="name"
                   highlight-current
-                  :check-strictly="checkStrictly"
                   :default-checked-keys="form.menus"
                   :expand-on-click-node="false"
                   :check-on-click-node="true"
-                  :data="menuData"
+                  :data="menus"
                 />
               </div>
             </el-card>
@@ -56,7 +55,6 @@
 
 <script>
 import { getPathListAll } from '@/api/system/path'
-import { getMenuListAll } from '@/api/system/menu'
 
 export default {
   name: 'AddPermissionTree',
@@ -67,62 +65,48 @@ export default {
         return {}
       }
     },
-    loading: {
-      type: Boolean
+    menus: {
+      type: Array,
+      default() {
+        return []
+      }
     },
-    checkStrictly: {
+    loading: {
       type: Boolean
     }
   },
   data() {
     return {
-      checkData: [],
-      menuData: []
+      checkData: []
     }
   },
   created() {
-    this.getMenuList()
     this.getList()
+    this.setNodes()
   },
   methods: {
 
-    /* 获取接口权限 */
     getList() {
       getPathListAll().then((res) => {
         this.checkData = res.data
       })
     },
 
-    // 获取所有菜单
-    getMenuList() {
-      getMenuListAll().then((res) => {
-        const data = res.data.items
-        for (let i = 0; i < data.length; i++) {
-          const item = data[i]
-          const menu = {
-            name: item.name,
-            label: item.title
+    /* 设置节点选中状态 */
+    setNodes() {
+      this.$nextTick(() => {
+        // 获取当前选中的所有节点
+        const checkedNodes = this.$refs.tree.getCheckedKeys(false)
+        // 如果当前选中的节点用户没有权限，则取消选中（在渲染组件时子节点如果选中，默认会选中同级所有节点，导致显示会出错，所以需要重置设置）
+        for (const i of checkedNodes) {
+          if (!this.form.menus.includes(i)) {
+            this.$refs.tree.setChecked(i, false)
           }
-
-          if (item.SubMenus) {
-            menu.children = item.SubMenus.map(subItem => ({
-              name: subItem.name,
-              label: subItem.title
-            }))
-          }
-          this.menuData.push(menu)
         }
-
-        this.$nextTick(() => {
-          // 设置选中的菜单
-          this.$refs.tree.setCheckedKeys(this.form.menus)
-          // 设置父子菜单关联关系
-          this.$emit('strictly')
-        })
       })
     },
 
-    // 全选&&全部取消
+    /* 全选&&全部取消 */
     handleCheckAll(val, item) {
       // 过滤掉没有选中的数据，item.child中不包含v时返回-1
       const next = item.paths.map(item => item.name)
@@ -132,7 +116,7 @@ export default {
       this.form.paths = val ? filterArr.concat(next) : filterArr
     },
 
-    // 筛选框勾选时状态变化
+    /* 筛选框勾选时状态变化 */
     handleChange(val) {
       const infoLists = val.paths.map(ite => ite.name)
       infoLists.every((v) => {
@@ -144,7 +128,7 @@ export default {
       })
     },
 
-    // 判断是否为全选状态
+    /* 判断是否为全选状态 */
     isIndeterminate(item) {
       const infoLists = item.paths.map(ite => ite.name)
       return (
@@ -173,7 +157,7 @@ export default {
 
 <style scoped>
 .down-tree{
-  height: 300px;
+  height: 350px;
   display: block;
   overflow-y: auto;
 }

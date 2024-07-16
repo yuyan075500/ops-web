@@ -85,9 +85,8 @@
       <add-permission-tree
         ref="form"
         :form="currentValue"
+        :menus="menus"
         :loading="loading"
-        :check-strictly="checkStrictly"
-        @strictly="handleStrictly"
         @close="handleClose"
         @submit="handlePermissionSubmit"
       />
@@ -98,6 +97,7 @@
 <script>
 import { Message } from 'element-ui'
 import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser, changeGroupPermission } from '@/api/user/group'
+import { getMenuListAll } from '@/api/system/menu'
 import GroupListTable from './table'
 import GroupAddForm from './form'
 import AddUserTransfer from './user-transfer'
@@ -117,11 +117,11 @@ export default {
       total: 0,
       formTitle: '',
       currentValue: undefined,
+      menus: [],
       transferData: {
         leftData: [],
         rightData: []
       },
-      checkStrictly: true,
       queryParams: {
         name: '',
         page: 1,
@@ -135,6 +135,7 @@ export default {
   },
   created() {
     this.getList()
+    this.getMenuList()
   },
   methods: {
     /* 查找数据 */
@@ -205,13 +206,28 @@ export default {
       this.formTitle = '权限管理'
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
-      // 配置父子菜单是否关联（true表示不关联）
-      this.checkStrictly = true
     },
 
-    /* 更改角色权限管理中父子菜单是否关联（false表示关联） */
-    handleStrictly() {
-      this.checkStrictly = false
+    /* 获取所有菜单 */
+    getMenuList() {
+      getMenuListAll().then((res) => {
+        const data = res.data.items
+        for (let i = 0; i < data.length; i++) {
+          const item = data[i]
+          const menu = {
+            name: item.name,
+            label: item.title
+          }
+
+          if (item.SubMenus) {
+            menu.children = item.SubMenus.map(subItem => ({
+              name: subItem.name,
+              label: subItem.title
+            }))
+          }
+          this.menus.push(menu)
+        }
+      })
     },
 
     /* 表单关闭 */

@@ -72,7 +72,7 @@ export function getVerificationCode(data) {
 // 密码重置（用户自助）
 export function resetPasswordSelf(data) {
   return request({
-    url: '/api/v1/user/reset_password',
+    url: '/api/v1/reset_password',
     method: 'post',
     data
   })

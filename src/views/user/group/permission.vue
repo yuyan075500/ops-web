@@ -33,7 +33,7 @@
                 <ul class="item">
                   <li v-for="(item, index) in checkData" :key="index">
                     <el-checkbox v-model="item.flag" :indeterminate="isIndeterminate(item)" @change="(val) => handleCheckAll(val, item)">{{ item.menu_name }}</el-checkbox>
-                    <el-checkbox-group v-model="form.paths" class="checkbox-group" @change="handleChange(item)">
+                    <el-checkbox-group v-model="form.paths" class="checkbox-group" @change="() => handleChange(item)">
                       <el-checkbox v-for="path in item.paths" :key="path.id" :label="path.name" class="checkbox-group-item">{{ path.description }}</el-checkbox>
                     </el-checkbox-group>
                   </li>
@@ -85,10 +85,10 @@ export default {
     this.setNodes()
   },
   methods: {
-
     getList() {
       getPathListAll().then((res) => {
         this.checkData = res.data
+        this.updateCheckDataFlags()
       })
     },
 
@@ -106,35 +106,40 @@ export default {
       })
     },
 
-    /* 全选&&全部取消 */
-    handleCheckAll(val, item) {
-      // 过滤掉没有选中的数据，item.child中不包含v时返回-1
-      const next = item.paths.map(item => item.name)
-      const filterArr = this.form.paths.filter(
-        (v) => next.indexOf(v) === -1
-      )
-      this.form.paths = val ? filterArr.concat(next) : filterArr
+    /* 判断全选按钮的状态是否为全选或全不选 */
+    isAllChecked(item) {
+      const infoLists = item.paths.map(ite => ite.name)
+      return infoLists.every(v => this.form.paths.indexOf(v) > -1)
     },
 
-    /* 筛选框勾选时状态变化 */
-    handleChange(val) {
-      const infoLists = val.paths.map(ite => ite.name)
-      infoLists.every((v) => {
-        if (this.form.paths.indexOf(v) > -1) {
-          val.flag = true
-        } else {
-          val.flag = false
-        }
-      })
-    },
-
-    /* 判断是否为全选状态 */
+    /* 判断是全选按钮否为半选状态 */
     isIndeterminate(item) {
       const infoLists = item.paths.map(ite => ite.name)
       return (
         infoLists.some((v) => this.form.paths.indexOf(v) > -1) &&
         !infoLists.every((v) => this.form.paths.indexOf(v) > -1)
       )
+    },
+
+    /* 全选按钮点击时 */
+    handleCheckAll(val, item) {
+      const next = item.paths.map(path => path.name)
+      const filterArr = this.form.paths.filter(v => next.indexOf(v) === -1)
+      this.form.paths = val ? filterArr.concat(next) : filterArr
+      this.updateCheckDataFlags()
+    },
+
+    /* 分组按钮点击时 */
+    handleChange(item) {
+      this.$set(item, 'flag', this.isAllChecked(item))
+      this.updateCheckDataFlags()
+    },
+
+    /* 更新全选按钮状态 */
+    updateCheckDataFlags() {
+      this.checkData.forEach(item => {
+        this.$set(item, 'flag', this.isAllChecked(item))
+      })
     },
 
     /* 提交表单 */

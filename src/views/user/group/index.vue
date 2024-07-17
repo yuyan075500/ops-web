@@ -86,6 +86,7 @@
         ref="form"
         :form="currentValue"
         :menus="menus"
+        :paths="paths"
         :loading="loading"
         @close="handleClose"
         @submit="handlePermissionSubmit"
@@ -98,6 +99,7 @@
 import { Message } from 'element-ui'
 import { getGroupList, addGroup, changeGroup, deleteGroup, changeGroupUser, changeGroupPermission } from '@/api/user/group'
 import { getMenuListAll } from '@/api/system/menu'
+import { getPathListAll } from '@/api/system/path'
 import GroupListTable from './table'
 import GroupAddForm from './form'
 import AddUserTransfer from './user-transfer'
@@ -118,6 +120,7 @@ export default {
       formTitle: '',
       currentValue: undefined,
       menus: [],
+      paths: [],
       transferData: {
         leftData: [],
         rightData: []
@@ -136,6 +139,7 @@ export default {
   created() {
     this.getList()
     this.getMenuList()
+    this.getPathList()
   },
   methods: {
     /* 查找数据 */
@@ -206,6 +210,13 @@ export default {
       this.formTitle = '权限管理'
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
+    /* 获取所有接口 */
+    getPathList() {
+      getPathListAll().then((res) => {
+        this.paths = res.data
+      })
     },
 
     /* 获取所有菜单 */

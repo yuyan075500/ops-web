@@ -31,7 +31,7 @@
               </div>
               <div class="down-tree">
                 <ul class="item">
-                  <li v-for="(item, index) in checkData" :key="index">
+                  <li v-for="(item, index) in paths" :key="index">
                     <el-checkbox v-model="item.flag" :indeterminate="isIndeterminate(item)" @change="(val) => handleCheckAll(val, item)">{{ item.menu_name }}</el-checkbox>
                     <el-checkbox-group v-model="form.paths" class="checkbox-group" @change="() => handleChange(item)">
                       <el-checkbox v-for="path in item.paths" :key="path.id" :label="path.name" class="checkbox-group-item">{{ path.description }}</el-checkbox>
@@ -54,8 +54,6 @@
 </template>
 
 <script>
-import { getPathListAll } from '@/api/system/path'
-
 export default {
   name: 'AddPermissionTree',
   props: {
@@ -71,27 +69,21 @@ export default {
         return []
       }
     },
+    paths: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
     loading: {
       type: Boolean
     }
   },
-  data() {
-    return {
-      checkData: []
-    }
-  },
   created() {
-    this.getList()
     this.setNodes()
+    this.updateCheckDataFlags()
   },
   methods: {
-    getList() {
-      getPathListAll().then((res) => {
-        this.checkData = res.data
-        this.updateCheckDataFlags()
-      })
-    },
-
     /* 设置节点选中状态 */
     setNodes() {
       this.$nextTick(() => {
@@ -137,7 +129,7 @@ export default {
 
     /* 更新全选按钮状态 */
     updateCheckDataFlags() {
-      this.checkData.forEach(item => {
+      this.paths.forEach(item => {
         this.$set(item, 'flag', this.isAllChecked(item))
       })
     },

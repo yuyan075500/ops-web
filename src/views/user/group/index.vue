@@ -4,7 +4,7 @@
     <!-- 表格搜索 -->
     <el-form :inline="true">
       <el-form-item label="分组名：">
-        <el-input v-model="queryParams.name" size="small" prefix-icon="el-icon-search" clearable />
+        <el-input v-model="queryParams.name" placeholder="分组名" size="small" prefix-icon="el-icon-search" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="searchList">查询</el-button>
@@ -48,7 +48,7 @@
       :show-close="false"
       width="500px"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <!-- 表单组件 -->
       <group-add-form
@@ -67,7 +67,7 @@
       :show-close="false"
       width="850px"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" :loading="loading" @close="handleClose" @submit="handleUserSubmit" />
     </el-dialog>
@@ -80,7 +80,7 @@
       :visible.sync="permissionDialog"
       :show-close="false"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <add-permission-tree
         ref="form"

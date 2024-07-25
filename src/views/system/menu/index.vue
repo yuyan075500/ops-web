@@ -41,7 +41,7 @@
       :show-close="false"
       width="700px"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <!-- 表单组件 -->
       <menu-add-form

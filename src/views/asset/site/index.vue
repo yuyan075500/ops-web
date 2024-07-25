@@ -49,7 +49,7 @@
       :show-close="false"
       :close-on-click-modal="false"
       width="500px"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <group-add-form
         ref="form"
@@ -68,7 +68,7 @@
       :close-on-click-modal="false"
       :destroy-on-close="true"
       width="810px"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <site-add-form
         ref="form"

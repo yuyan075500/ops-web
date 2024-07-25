@@ -51,7 +51,7 @@
       :show-close="false"
       width="810px"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <!-- 表单组件 -->
       <user-add-form
@@ -70,7 +70,7 @@
       :show-close="false"
       width="500px"
       :close-on-click-modal="false"
-      @close="handleClose"
+      @closed="handleClose"
     >
       <el-alert
         type="warning"

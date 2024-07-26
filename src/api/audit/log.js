@@ -8,3 +8,12 @@ export function getSMSRecordList(params) {
     params
   })
 }
+
+// 获取用户登录记录
+export function getLoginRecordList(params) {
+  return request({
+    url: '/api/v1/audit/login/list',
+    method: 'get',
+    params
+  })
+}

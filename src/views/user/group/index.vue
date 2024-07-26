@@ -145,12 +145,12 @@ export default {
     /* 查找数据 */
     searchList() {
       this.queryParams.page = 1
-      this.loading = true
       this.getList()
     },
 
     /* 获取数据 */
     getList() {
+      this.loading = true
       getGroupList(this.queryParams).then((res) => {
         this.tableData = res.data.items
         this.total = res.data.total

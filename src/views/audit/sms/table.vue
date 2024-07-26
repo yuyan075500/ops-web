@@ -21,6 +21,7 @@
 import moment from 'moment'
 
 export default {
+  name: 'SmsListTable',
   props: {
     tableData: {
       type: Array,

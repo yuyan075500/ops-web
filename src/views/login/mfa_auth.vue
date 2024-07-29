@@ -71,6 +71,11 @@ export default {
         clearInterval(times)
       }
     }, 1000)
+
+    window.addEventListener('keydown', this.handleKeydown)
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleKeydown)
   },
   methods: {
     /* 登录 */
@@ -86,6 +91,14 @@ export default {
           return false
         }
       })
+    },
+
+    /* 回车事件 */
+    handleKeydown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        this.handleNext()
+      }
     },
 
     /* 返回登录页 */

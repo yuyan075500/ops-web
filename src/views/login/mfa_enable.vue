@@ -76,10 +76,14 @@ export default {
         clearInterval(time)
       }
     }, 1000)
+    window.addEventListener('keydown', this.handleKeydown)
   },
   created() {
     // 获取MFA二维码
     this.getQrcode()
+  },
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.handleKeydown)
   },
   methods: {
     /* 获取MFA二维码 */
@@ -90,7 +94,7 @@ export default {
     },
 
     /* 登录 */
-    handleLogin() {
+    handleNext() {
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.$store.dispatch('user/mfa_auth', this.form).then((res) => {
@@ -103,7 +107,13 @@ export default {
         }
       })
     },
-
+    /* 回车事件 */
+    handleKeydown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        this.handleNext()
+      }
+    },
     /* 返回登录页 */
     handleBack() {
       this.$router.push({ path: this.redirect || '/login' })

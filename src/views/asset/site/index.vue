@@ -83,7 +83,7 @@
 
     <!-- 站点信息 -->
     <el-drawer :visible.sync="siteInfoDrawer" :show-close="false" :wrapper-closable="false" :size="700">
-      <site-info :form="currentValue" @close="handleClose" />
+      <site-info ref="form" :form="currentValue" @close="handleClose" />
     </el-drawer>
   </div>
 </template>

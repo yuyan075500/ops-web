@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 获取短信发送记录
 export function getSMSRecordList(params) {
   return request({
-    url: '/api/v1/audit/sms/list',
+    url: '/api/v1/audit/sms',
     method: 'get',
     params
   })
@@ -12,7 +12,7 @@ export function getSMSRecordList(params) {
 // 获取用户登录记录
 export function getLoginRecordList(params) {
   return request({
-    url: '/api/v1/audit/login/list',
+    url: '/api/v1/audit/login',
     method: 'get',
     params
   })

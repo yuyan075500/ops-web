@@ -28,6 +28,7 @@
       @delete-group="handleDeleteGroup"
       @delete-site="handleDeleteSite"
       @add="handleAddSite"
+      @detail="handleDetail"
     />
 
     <!-- 分页 -->
@@ -79,6 +80,11 @@
         @submit="handleSiteSubmit"
       />
     </el-dialog>
+
+    <!-- 站点信息 -->
+    <el-drawer :visible.sync="siteInfoDrawer" :show-close="false" :wrapper-closable="false" :size="700">
+      <site-info :form="currentValue" @close="handleClose" />
+    </el-drawer>
   </div>
 </template>
 
@@ -88,12 +94,14 @@ import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, 
 import GroupTable from './table'
 import GroupAddForm from './form'
 import SiteAddForm from './site-form'
+import SiteInfo from './site-info'
 
 export default {
   components: {
     GroupTable,
     GroupAddForm,
-    SiteAddForm
+    SiteAddForm,
+    SiteInfo
   },
   data() {
     return {
@@ -109,7 +117,8 @@ export default {
         limit: 15
       },
       groupAddDialog: false,
-      siteAddDialog: false
+      siteAddDialog: false,
+      siteInfoDrawer: false
     }
   },
   created() {
@@ -181,6 +190,12 @@ export default {
       this.formTitle = '修改站点'
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
+    /* 站点详情 */
+    handleDetail(value) {
+      this.currentValue = { ...value }
+      this.siteInfoDrawer = true
     },
 
     /* 删除站点分组 */
@@ -328,6 +343,8 @@ export default {
       // 关闭所有Dialog
       this.groupAddDialog = false
       this.siteAddDialog = false
+      // 关闭所有Drawer
+      this.siteInfoDrawer = false
       // 清空表单数据
       this.currentValue = undefined
       this.group = NaN

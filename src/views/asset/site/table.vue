@@ -120,7 +120,11 @@ export default {
 
     /* 开放所有用户访问权限 */
     handleAllOpen(value) {
-      this.$emit('open', value)
+      // 将icon重置为空再提交
+      const newValue = { ...value }
+      newValue.icon = ''
+      // 使用新的值提交
+      this.$emit('open', newValue)
     },
 
     /* 站点用户管理 */

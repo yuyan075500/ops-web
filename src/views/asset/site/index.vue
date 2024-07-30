@@ -60,13 +60,13 @@
       />
     </el-dialog>
 
-    <!-- 添加站点 -->
+    <!-- 添加站点：v-if可以确保Dialog打开时，子组件每次都重新创建 -->
     <el-dialog
+      v-if="siteAddDialog"
       :title="formTitle"
       :visible.sync="siteAddDialog"
       :show-close="false"
       :close-on-click-modal="false"
-      :destroy-on-close="true"
       width="810px"
       @closed="handleClose"
     >

@@ -19,7 +19,11 @@ const getDefaultState = () => {
     // ID
     id: '',
     // 菜单
-    menus: []
+    menus: [],
+    // 接口权限
+    permissions: [],
+    // 角色
+    roles: []
   }
 }
 
@@ -52,6 +56,12 @@ const mutations = {
   },
   SET_MENUS: (state, menus) => {
     state.menus = menus
+  },
+  SET_PERMISSIONS: (state, permissions) => {
+    state.permissions = permissions
+  },
+  SET_ROLES: (state, roles) => {
+    state.roles = roles
   }
 }
 
@@ -103,7 +113,7 @@ const actions = {
       getUserInfo().then(response => {
         if (response.code === 0) {
           const { data } = response
-          const { id, name, avatar, username, email, phone_number } = data
+          const { id, name, avatar, username, email, phone_number, roles, permissions } = data
           let { menus } = data
 
           // 如果后端返回的菜单为null，则需要将变量menus更改为空数组，否则后面无法追加404路由，会导致用户登录后如何进入系统
@@ -125,6 +135,8 @@ const actions = {
           commit('SET_ID', id)
           commit('SET_PHONE_NUMBER', phone_number)
           commit('SET_MENUS', menus)
+          commit('SET_PERMISSIONS', permissions)
+          commit('SET_ROLES', roles)
           resolve(data)
         }
       }).catch(error => {

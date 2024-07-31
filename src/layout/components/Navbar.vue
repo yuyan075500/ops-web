@@ -24,52 +24,113 @@
     </div>
 
     <el-drawer
-      title="个人信息"
       :visible.sync="userInfoDrawer"
       direction="rtl"
       :show-close="false"
-      size="500px"
+      size="800px"
       @close="userInfoDrawer = false"
     >
-      <el-form ref="form" :model="form" :validate-on-rule-change="false" label-position="right" label-width="120px" style="width: 95%">
-        <el-form-item label="姓名：">
-          <span>{{ name }}</span>
-        </el-form-item>
-        <el-form-item label="登录用户名：">
-          <span>{{ username }}</span>
-        </el-form-item>
-        <el-form-item label="邮箱：">
-          <span>{{ email }}</span>
-        </el-form-item>
-        <el-form-item label="手机号：">
-          <span>{{ phone_number }}</span>
-        </el-form-item>
-        <el-form-item label="头像：">
-          <el-upload
-            name="avatar"
-            class="avatar-uploader"
-            accept="image/jpeg,image/jpg,image/png"
-            :headers="{ Authorization: `Bearer ${token}` }"
-            :action="uploadUrl"
-            :limit="1"
-            :multiple="false"
-            :auto-upload="true"
-            :file-list="fileList"
-            :show-file-list="false"
-            :on-change="handleChange"
-            :on-success="handleSuccess"
-          >
-            <img v-if="avatarPreview !== undefined" :src="avatarPreview" class="avatar">
-            <img v-else-if="avatar !== ''" :src="avatar" class="avatar">
-            <img v-else src="../../assets/avatar/default.jpg" class="avatar">
-          </el-upload>
-          <div class="help-block" style="color: #999; font-size: 12px; line-height: 0px;">点击图片可更换个性化头像</div>
-        </el-form-item>
+      <el-form ref="form" :model="form" :validate-on-rule-change="false" label-position="right" label-width="120px" style="width: 100%;padding-left: 20px;padding-right: 20px">
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-card class="box-card" shadow="hover">
+              <div slot="header" class="clearfix">
+                <span>菜单权限</span>
+              </div>
+              <!-- 树形菜单 -->
+              <div class="down-tree">
+                <el-tree
+                  ref="tree"
+                  default-expand-all
+                  node-key="name"
+                  :data="newMenus"
+                />
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="16">
+            <el-card class="box-card" shadow="hover">
+              <div slot="header" class="clearfix">
+                <span>基础信息</span>
+              </div>
+              <div class="down-tree">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="姓名：">
+                      <span>{{ name }}</span>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="用户名：">
+                      <span>{{ username }}</span>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="邮箱：">
+                      <span>{{ email }}</span>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="手机号：">
+                      <span>{{ phone_number }}</span>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-form-item label="角色：">
+                  <el-tag
+                    v-for="(item, index) in roles"
+                    :key="index"
+                    size="small"
+                    style="margin-right: 10px"
+                  >
+                    {{ item }}
+                  </el-tag>
+                </el-form-item>
+                <el-form-item label="头像：">
+                  <el-upload
+                    name="avatar"
+                    class="avatar-uploader"
+                    accept="image/jpeg,image/jpg,image/png"
+                    :headers="{ Authorization: `Bearer ${token}` }"
+                    :action="uploadUrl"
+                    :limit="1"
+                    :multiple="false"
+                    :auto-upload="true"
+                    :file-list="fileList"
+                    :show-file-list="false"
+                    :on-change="handleChange"
+                    :on-success="handleSuccess"
+                  >
+                    <img v-if="avatarPreview !== undefined" :src="avatarPreview" class="avatar">
+                    <img v-else-if="avatar !== ''" :src="avatar" class="avatar">
+                    <img v-else src="../../assets/avatar/default.jpg" class="avatar">
+                  </el-upload>
+                  <div class="help-block" style="color: #999; font-size: 12px; line-height: 0px;">点击图片可进行头像更换</div>
+                </el-form-item>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-card class="box-card" shadow="hover" style="margin-top: 20px;">
+          <div slot="header" class="clearfix">
+            <span>接口权限</span>
+          </div>
+          <div>
+            <el-tag
+              v-for="(item, index) in permissions"
+              :key="index"
+              size="small"
+              style="margin-bottom: 10px;margin-right: 10px"
+            >
+              {{ item }}
+            </el-tag>
+          </div>
+        </el-card>
+        <!-- <div class="drawer-footer">
+          <el-button @click="userInfoDrawer = false">取 消</el-button>
+          <el-button type="primary">提 交</el-button>
+        </div> -->
       </el-form>
-      <div class="drawer-footer">
-        <el-button @click="userInfoDrawer = false">取 消</el-button>
-        <el-button type="primary">提 交</el-button>
-      </div>
     </el-drawer>
 
   </div>
@@ -93,7 +154,8 @@ export default {
       form: {},
       avatarPreview: undefined,
       fileList: [],
-      token: getToken()
+      token: getToken(),
+      newMenus: []
     }
   },
   computed: {
@@ -103,6 +165,9 @@ export default {
       'name',
       'username',
       'email',
+      'menus',
+      'roles',
+      'permissions',
       'phone_number'
     ]),
     uploadUrl() {
@@ -111,6 +176,26 @@ export default {
       } else {
         return process.env.VUE_APP_BASE_API + '/api/v1/user/avatarUpload'
       }
+    }
+  },
+  created() {
+    // 根据当前用户的菜单，生成菜单树，用于展示用户当前菜单权限
+    for (let i = 0; i < this.menus.length; i++) {
+      const item = this.menus[i]
+      if (!item.meta || !item.meta.title) {
+        continue
+      }
+      const menu = {
+        name: item.name,
+        label: item.meta.title
+      }
+      if (item.children) {
+        menu.children = item.children.map(subItem => ({
+          name: subItem.name,
+          label: subItem.meta.title
+        }))
+      }
+      this.newMenus.push(menu)
     }
   },
   methods: {
@@ -177,8 +262,8 @@ export default {
     overflow: hidden;
 
     .avatar {
-      width: 178px;
-      height: 178px;
+      width: 130px;
+      height: 130px;
       display: block;
     }
   }
@@ -225,5 +310,12 @@ export default {
   padding: 10px 16px;
   text-align: right;
   background-color: white;
+}
+
+// 菜单权限和基础信息高度固定
+.down-tree{
+  height: 360px;
+  display: block;
+  overflow-y: auto;
 }
 </style>

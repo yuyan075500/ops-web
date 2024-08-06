@@ -82,7 +82,7 @@ export default {
     handleNext() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          // 合并URL中的query参数
+          // 合并URL中的query参数（主要是SSO客户端的请求参数同样需要发送到后端）
           const newForm = {
             ...this.form,
             ...this.$route.query

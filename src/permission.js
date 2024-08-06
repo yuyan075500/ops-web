@@ -28,24 +28,13 @@ router.beforeEach(async(to, from, next) => {
   // 确认用户是否登录
   if (hasToken) {
     if (to.path === '/login') {
-      // 单点登录处理逻辑（注：已登录）
-
+      // 如果URL的Query中有service或client_id参数，则需要进行SSO认证
       const service = getParameterByName('service')
       const client_id = getParameterByName('client_id')
-      if (service) {
-        // CAS 认证处理逻辑
-      } else if (client_id) {
-        // OAuth2.0 认证处理逻辑
 
-        // 获取redirect_uri、response_type、scope和state
-        const redirect_uri = getParameterByName('redirect_uri')
-        const response_type = getParameterByName('response_type')
-        const scope = getParameterByName('scope')
-        const state = getParameterByName('state')
-
-        // 获取授权OAuth授权
-        const data = { 'client_id': client_id, 'redirect_uri': redirect_uri, 'response_type': response_type, 'scope': scope, 'state': state }
-        OAuthAuthorize(data).then(res => {
+      if (service || client_id) {
+        // to.query可以获取到当前路由中的query参数
+        OAuthAuthorize(to.query).then(res => {
           if (res.code === 0) {
             console.log(res.redirect_uri)
             // 跳转到客户端

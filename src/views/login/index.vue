@@ -79,18 +79,6 @@ export default {
         password: '',
         ldap: false
       },
-      // 使用CAS3.0认证客户端的请求参数
-      cas: {
-        service: undefined
-      },
-      // 使用OAuth2.0认证客户端的请求参数
-      oauth2: {
-        response_type: undefined, // 授权类型，固定值：code
-        client_id: undefined, // 客户端ID，必选
-        redirect_uri: undefined, // 重定向URL，可选
-        scope: undefined, // 申请权限范围，可选
-        state: undefined // 客户端状态，可选，预防CSRF攻击，服务端原封不动返回
-      },
       // 钉钉扫码认证相关参数
       dingtalk: {
         redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login' // 认证成功后的回调地址
@@ -115,14 +103,6 @@ export default {
       handler: function(route) {
         // 获取登录成功后跳转的路径
         this.redirect = route.query && route.query.redirect
-        // 获取OAuth2.0认证客户端的请求参数
-        this.oauth2.response_type = route.query.response_type
-        this.oauth2.client_id = route.query.client_id
-        this.oauth2.redirect_uri = route.query.redirect_uri
-        this.oauth2.scope = route.query.scope
-        this.oauth2.state = route.query.state
-        // 获取CAS3.0认证客户端的请求参数
-        this.cas.service = route.query.service
       },
       immediate: true
     }
@@ -151,38 +131,29 @@ export default {
         if (valid) {
           this.loading = true
 
-          // 登录表单中添加OAuth2.0认证相关参数CAS3.0认证相关参数
-          if (this.cas.service) {
-            this.loginForm['service'] = this.cas.service
-          }
-
-          if (this.oauth2.client_id) {
-            // 登录表单中添加OAuth2.0认证相关参数
-            this.loginForm['client_id'] = this.oauth2.client_id
-            this.loginForm['response_type'] = this.oauth2.response_type
-            this.loginForm['scope'] = this.oauth2.scope
-            this.loginForm['redirect_uri'] = this.oauth2.redirect_uri
-            this.loginForm['state'] = this.oauth2.state
+          // 合并URL中的query参数（主要是SSO客户端的请求参数同样需要发送到后端）
+          const newForm = {
+            ...this.loginForm,
+            ...this.$route.query
           }
 
           // 执行登录
-          this.$store.dispatch('user/login', this.loginForm).then((res) => {
-            // redirect_uri不为undefined表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
+          this.$store.dispatch('user/login', newForm).then((res) => {
+            // redirect_uri表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
             if (res.redirect_uri !== undefined) {
               window.location.href = res.redirect_uri
             }
 
-            // redirect不为undefined表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面
-            if (res.redirect !== undefined) {
+            // redirect表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面
+            if (res.redirect) {
+              // 如果是MFA认证，则需要将SSO客户端请求参数传递到MFA认证页面
               this.$router.push({
                 name: res.redirect,
                 params: {
                   token: res.token,
                   username: this.loginForm.username
                 },
-                query: {
-                  redirect: this.redirect
-                }
+                query: this.$route.query
               })
             } else {
               this.$router.push({ path: this.redirect || '/' })

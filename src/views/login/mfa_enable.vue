@@ -97,10 +97,19 @@ export default {
     handleNext() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.$store.dispatch('user/mfa_auth', this.form).then((res) => {
-            if (res.code === 0) {
-              this.$router.push({ path: this.redirect || '/' })
+          // 合并URL中的query参数（主要是SSO客户端的请求参数同样需要发送到后端）
+          const newForm = {
+            ...this.form,
+            ...this.$route.query
+          }
+
+          this.$store.dispatch('user/mfa_auth', newForm).then((res) => {
+            // redirect_uri表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
+            if (res.redirect_uri) {
+              window.location.href = res.redirect_uri
             }
+
+            this.$router.push({ path: this.redirect || '/' })
           }).catch(() => {})
         } else {
           return false
@@ -116,7 +125,7 @@ export default {
     },
     /* 返回登录页 */
     handleBack() {
-      this.$router.push({ path: this.redirect || '/login' })
+      this.$router.push({ path: this.redirect || '/login', query: this.$route.query })
     }
   }
 }

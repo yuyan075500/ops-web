@@ -29,6 +29,7 @@
       @delete-site="handleDeleteSite"
       @add="handleAddSite"
       @detail="handleDetail"
+      @user="handleEditUser"
     />
 
     <!-- 分页 -->
@@ -85,23 +86,37 @@
     <el-drawer :visible.sync="siteInfoDrawer" :show-close="false" :wrapper-closable="false" :size="700">
       <site-info ref="form" :form="currentValue" @close="handleClose" />
     </el-drawer>
+
+    <!-- 用户管理 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="userDialog"
+      :show-close="false"
+      width="850px"
+      :close-on-click-modal="false"
+      @closed="handleClose"
+    >
+      <add-user-transfer ref="form" :form="currentValue" :transfer-data="transferData" :loading="loading" @close="handleClose" @submit="handleUserSubmit" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui'
-import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, deleteSite } from '@/api/asset/site'
+import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, deleteSite, changeSiteUser } from '@/api/asset/site'
 import GroupTable from './table'
 import GroupAddForm from './form'
 import SiteAddForm from './site-form'
 import SiteInfo from './site-info'
+import AddUserTransfer from './user-transfer'
 
 export default {
   components: {
     GroupTable,
     GroupAddForm,
     SiteAddForm,
-    SiteInfo
+    SiteInfo,
+    AddUserTransfer
   },
   data() {
     return {
@@ -116,8 +131,13 @@ export default {
         page: 1,
         limit: 15
       },
+      transferData: {
+        leftData: [],
+        rightData: []
+      },
       groupAddDialog: false,
       siteAddDialog: false,
+      userDialog: false,
       siteInfoDrawer: false
     }
   },
@@ -196,6 +216,20 @@ export default {
     handleDetail(value) {
       this.currentValue = { ...value }
       this.siteInfoDrawer = true
+    },
+
+    /* 管理用户 */
+    handleEditUser(rowData) {
+      // 显示弹框
+      this.userDialog = true
+      // 更改弹框标题
+      this.formTitle = '用户管理'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
+      // 定义分组已存在用户列表
+      for (let i = 0; i < rowData.users.length; i++) {
+        this.transferData.rightData.push(rowData.users[i].id)
+      }
     },
 
     /* 删除站点分组 */
@@ -338,16 +372,36 @@ export default {
       }
     },
 
+    /* 站点用户修改 */
+    handleUserSubmit(formData) {
+      this.loading = true
+      changeSiteUser(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
       this.groupAddDialog = false
       this.siteAddDialog = false
+      this.userDialog = false
       // 关闭所有Drawer
       this.siteInfoDrawer = false
       // 清空表单数据
       this.currentValue = undefined
       this.group = NaN
+      this.transferData.rightData = []
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

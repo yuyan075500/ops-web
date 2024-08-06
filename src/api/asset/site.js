@@ -60,6 +60,15 @@ export function changeGroup(data) {
   })
 }
 
+// 修改站点用户
+export function changeSiteUser(data) {
+  return request({
+    url: '/api/v1/site/users',
+    method: 'put',
+    data
+  })
+}
+
 // 修改站点
 export function changeSite(data) {
   return request({

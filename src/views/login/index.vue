@@ -71,34 +71,64 @@ export default {
   name: 'Login',
   data() {
     return {
-      // 默认登录方式
+      // 指定默认登录方式
       active: 'username',
-      // 用户名密码登录表单
+      // 用户名密码登录表单数据
       loginForm: {
         username: '',
         password: '',
         ldap: false
       },
+      // 使用CAS3.0认证客户端的请求参数
+      cas: {
+        service: undefined
+      },
+      // 使用OAuth2.0认证客户端的请求参数
+      oauth2: {
+        response_type: undefined, // 授权类型，固定值：code
+        client_id: undefined, // 客户端ID，必选
+        redirect_uri: undefined, // 重定向URL，可选
+        scope: undefined, // 申请权限范围，可选
+        state: undefined // 客户端状态，可选，预防CSRF攻击，服务端原封不动返回
+      },
+      // 钉钉扫码认证相关参数
+      dingtalk: {
+        redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login' // 认证成功后的回调地址
+      },
+      // 用户名密码登录表单验证规则
       loginRules: {
         username: [{ required: true, trigger: 'change', message: '请输入用户名' }],
         password: [{ required: true, trigger: 'change', message: '请输入用户密码' }]
       },
+      // 控制el-tabs标签页宽度自适应
       stretch: true,
+      // 控制登录按钮状态
       loading: false,
+      // 控制密码表单显示与隐藏
       passwordType: 'password',
-      redirect: undefined,
-      redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login'
+      // 登录成功后跳转的路径
+      redirect: undefined
     }
   },
   watch: {
     $route: {
       handler: function(route) {
+        // 获取登录成功后跳转的路径
         this.redirect = route.query && route.query.redirect
+        // 获取OAuth2.0认证客户端的请求参数
+        this.oauth2.response_type = route.query.response_type
+        this.oauth2.client_id = route.query.client_id
+        this.oauth2.redirect_uri = route.query.redirect_uri
+        this.oauth2.scope = route.query.scope
+        this.oauth2.state = route.query.state
+        // 获取CAS3.0认证客户端的请求参数
+        this.cas.service = route.query.service
       },
       immediate: true
     }
   },
   mounted() {
+    // 钉钉二维码初始化
     this.ddQrcodeinInit()
   },
   methods: {
@@ -120,7 +150,29 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+
+          // 登录表单中添加OAuth2.0认证相关参数CAS3.0认证相关参数
+          if (this.cas.service) {
+            this.loginForm['service'] = this.cas.service
+          }
+
+          if (this.oauth2.client_id) {
+            // 登录表单中添加OAuth2.0认证相关参数
+            this.loginForm['client_id'] = this.oauth2.client_id
+            this.loginForm['response_type'] = this.oauth2.response_type
+            this.loginForm['scope'] = this.oauth2.scope
+            this.loginForm['redirect_uri'] = this.oauth2.redirect_uri
+            this.loginForm['state'] = this.oauth2.state
+          }
+
+          // 执行登录
           this.$store.dispatch('user/login', this.loginForm).then((res) => {
+            // redirect_uri不为undefined表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
+            if (res.redirect_uri !== undefined) {
+              window.location.href = res.redirect_uri
+            }
+
+            // redirect不为undefined表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面
             if (res.redirect !== undefined) {
               this.$router.push({
                 name: res.redirect,
@@ -145,10 +197,10 @@ export default {
       })
     },
 
-    /* 钉钉二维码始化以及扫描登录成功后的动作 */
+    /* 钉钉二维码始、扫码成功后的动作 */
     ddQrcodeinInit() {
       if (window.location.port !== '80' && window.location.port !== '443') {
-        this.redirect_uri = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/login'
+        this.dingtalk.redirect_uri = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/login'
       }
       window.DTFrameLogin(
         // 二维码容器相关参数：绑定的容器id、宽度、高度
@@ -158,7 +210,7 @@ export default {
           height: 240 // 二维码容器高度
         },
         {
-          redirect_uri: encodeURIComponent(this.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
+          redirect_uri: encodeURIComponent(this.dingtalk.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
           client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值

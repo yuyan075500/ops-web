@@ -68,9 +68,8 @@ const mutations = {
 const actions = {
   // 用户登录
   login({ commit }, userInfo) {
-    const { username, password, ldap } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password, ldap: ldap }).then(response => {
+      login(userInfo).then(response => {
         const { token, redirect } = response
 
         // 如果redirect不为undefined，则直接返回

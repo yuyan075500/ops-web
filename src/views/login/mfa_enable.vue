@@ -20,7 +20,7 @@
           <el-button type="primary" style="width: 90%;margin-bottom: 20px" @click="handleBack">重新登录</el-button>
         </el-col>
         <el-col :span="12">
-          <el-button type="primary" style="width: 90%;margin-bottom: 20px" :disabled="seconds === 0" @click="handleLogin">登录</el-button>
+          <el-button type="primary" style="width: 90%;margin-bottom: 20px" :disabled="seconds === 0" @click="handleNext">登录</el-button>
         </el-col>
       </el-row>
 

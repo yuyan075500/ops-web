@@ -7,6 +7,7 @@ import getPageTitle from '@/utils/get-page-title'
 import Layout from '@/layout'
 import getParameterByName from '@/utils/url'
 import { OAuthAuthorize } from '@/api/sso/oauth'
+import { CASAuthorize } from '@/api/sso/cas'
 
 const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 
@@ -32,9 +33,18 @@ router.beforeEach(async(to, from, next) => {
       const service = getParameterByName('service')
       const client_id = getParameterByName('client_id')
 
-      if (service || client_id) {
+      if (client_id) {
         // to.query可以获取到当前路由中的query参数
         OAuthAuthorize(to.query).then(res => {
+          if (res.code === 0) {
+            console.log(res.redirect_uri)
+            // 跳转到客户端
+            window.location.href = res.redirect_uri
+          }
+        })
+      } else if (service) {
+        // to.query可以获取到当前路由中的query参数
+        CASAuthorize(to.query).then(res => {
           if (res.code === 0) {
             console.log(res.redirect_uri)
             // 跳转到客户端

@@ -30,6 +30,7 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
+    disableHostCheck: true, // 禁用主机头检查，开发环境中，如果请求的主机头和项目启动的不一至会报错：Invalid Host header
     port: port,
     open: true,
     overlay: {

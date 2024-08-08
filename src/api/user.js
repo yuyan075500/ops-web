@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 用户登录
 export function login(data) {
   return request({
-    url: '/login',
+    url: '/api/auth/login',
     method: 'post',
     data
   })
@@ -12,7 +12,7 @@ export function login(data) {
 // 用户注销
 export function logout() {
   return request({
-    url: '/logout',
+    url: '/api/auth/logout',
     method: 'post'
   })
 }

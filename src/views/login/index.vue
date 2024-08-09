@@ -43,14 +43,6 @@
             </span>
           </el-form-item>
 
-          <el-form-item label="使用Windows AD域认证：" class="login-form-switch">
-            <el-switch
-              v-model="loginForm.ldap"
-              active-color="#409EFF"
-              inactive-color="#C0CCDA"
-            />
-          </el-form-item>
-
           <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">登录</el-button>
         </el-tab-pane>
         <el-tab-pane label="钉钉扫码登录" name="qrcode" class="qrcode">
@@ -76,8 +68,7 @@ export default {
       // 用户名密码登录表单数据
       loginForm: {
         username: '',
-        password: '',
-        ldap: false
+        password: ''
       },
       // 钉钉扫码认证相关参数
       dingtalk: {

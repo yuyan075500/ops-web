@@ -8,6 +8,7 @@ import Layout from '@/layout'
 import getParameterByName from '@/utils/url'
 import { OAuthAuthorize } from '@/api/sso/oauth'
 import { CASAuthorize } from '@/api/sso/cas'
+import { SAMLAuthorize } from '@/api/sso/saml'
 
 const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 
@@ -32,12 +33,12 @@ router.beforeEach(async(to, from, next) => {
       // 如果URL的Query中有service或client_id参数，则需要进行SSO认证
       const service = getParameterByName('service')
       const client_id = getParameterByName('client_id')
+      const saml_request = getParameterByName('SAMLRequest')
 
       if (client_id) {
         // to.query可以获取到当前路由中的query参数
         OAuthAuthorize(to.query).then(res => {
           if (res.code === 0) {
-            console.log(res.redirect_uri)
             // 跳转到客户端
             window.location.href = res.redirect_uri
           }
@@ -46,7 +47,13 @@ router.beforeEach(async(to, from, next) => {
         // to.query可以获取到当前路由中的query参数
         CASAuthorize(to.query).then(res => {
           if (res.code === 0) {
-            console.log(res.redirect_uri)
+            // 跳转到客户端
+            window.location.href = res.redirect_uri
+          }
+        })
+      } else if (saml_request) {
+        SAMLAuthorize(to.query).then(res => {
+          if (res.code === 0) {
             // 跳转到客户端
             window.location.href = res.redirect_uri
           }

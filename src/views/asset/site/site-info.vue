@@ -17,7 +17,8 @@
           <span v-if="form.sso_type === 3">SAML2</span>
         </el-descriptions-item>
         <el-descriptions-item label="站点描述" span="2">{{ form.description }}</el-descriptions-item>
-        <el-descriptions-item label="回调地址" span="2">{{ form.callback_url }}</el-descriptions-item>
+        <el-descriptions-item v-if="form.sso_type !== 3" label="回调地址" span="2">{{ form.callback_url }}</el-descriptions-item>
+        <el-descriptions-item v-else label="SP EntityID" span="2">{{ form.entity_id }}</el-descriptions-item>
         <el-descriptions-item label="Client ID">
           <el-button
             v-clipboard:copy="form.client_id"

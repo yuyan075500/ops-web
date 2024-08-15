@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%" size="small">
+  <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="150px" style="width: 95%" size="small">
     <el-row>
       <el-col :span="10">
         <el-form-item label="站点名称：" prop="name">
@@ -14,7 +14,7 @@
     </el-row>
     <el-row>
       <el-col :span="10">
-        <el-form-item label="SSO认证：" prop="sso">
+        <el-form-item label="SSO 认证：" prop="sso">
           <el-switch v-model="form.sso" />
         </el-form-item>
       </el-col>
@@ -35,8 +35,31 @@
         </el-form-item>
       </el-col>
       <el-col :span="14">
-        <el-form-item label="回调地址：" prop="callback_url">
+        <el-form-item v-if="form.sso_type !== 3" label="回调地址：" prop="callback_url">
           <el-input v-model="form.callback_url" autocomplete="off" clearable />
+        </el-form-item>
+        <el-form-item v-else label="SP EntityID：" prop="entity_id">
+          <el-input v-model="form.entity_id" autocomplete="off" clearable />
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20">
+      <el-col :span="20">
+        <el-form-item label="SP Metadata URL：">
+          <el-input v-model="form.sp_metadata_url" autocomplete="off" clearable />
+          <div class="help-block" style="color: #999; font-size: 12px;">输入SP Metadata URL可以获取到 SP 的证书和 EntityID</div>
+        </el-form-item>
+      </el-col>
+      <el-col :span="4">
+        <el-form-item label-width="0px">
+          <el-button type="primary" size="mini" :loading="loading" :disabled="form.sso_type !== 3" @click="handleMetadata">获 取</el-button>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row>
+      <el-col :span="24">
+        <el-form-item label="SP 证书：" prop="certificate">
+          <el-input v-model="form.certificate" type="textarea" :rows="3" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
     </el-row>
@@ -71,7 +94,9 @@
 </template>
 
 <script>
+import { Message } from 'element-ui'
 import { getToken } from '@/utils/auth'
+import { ParseSPMetadata } from '@/api/sso/saml'
 
 export default {
   name: 'SiteAddForm',
@@ -86,6 +111,9 @@ export default {
           site_group_id: null,
           description: '',
           callback_url: null,
+          entity_id: null,
+          certificate: null,
+          sp_metadata_url: null,
           sso_type: null,
           sso: false
         }
@@ -117,19 +145,25 @@ export default {
         callback_url: [
           { required: false, message: '请输入站点回调地址', trigger: 'change' }
         ],
+        entity_id: [
+          { required: false, message: '请输入 SP 的 EntityID', trigger: 'change' }
+        ],
+        certificate: [
+          { required: false, message: '请输入 SP 的证书', trigger: 'change' }
+        ],
         description: [
           { required: true, message: '请输入站点描述信息', trigger: 'change' }
         ],
         sso_type: [
-          { required: false, message: '请选择SSO认证类型', trigger: 'change' }
+          { required: false, message: '请选择 SSO 认证类型', trigger: 'change' }
         ]
       }
     }
   },
   computed: {
     uploadUrl() {
-      if (process.env.VUE_APP_BASE_API === '\'') {
-        return '/api/v1/site/logoUpload'
+      if (process.env.VUE_APP_BASE_API === '/') {
+        return window.location.protocol + '//' + window.location.hostname + '/api/v1/site/logoUpload'
       } else {
         return process.env.VUE_APP_BASE_API + '/api/v1/site/logoUpload'
       }
@@ -142,17 +176,42 @@ export default {
       if (val) {
         this.rules.sso_type[0].required = true
         this.rules.callback_url[0].required = true
+        if (this.form.sso_type === 3) {
+          this.rules.entity_id[0].required = true
+          this.rules.certificate[0].required = true
+        }
       } else {
         this.rules.sso_type[0].required = false
         this.rules.callback_url[0].required = false
-        this.$refs.form.clearValidate('sso_type')
-        this.$refs.form.clearValidate('callback_url')
+        this.rules.entity_id[0].required = false
+        this.rules.certificate[0].required = false
+        this.$refs.form.clearValidate()
+      }
+    },
+    'form.sso_type'(val) {
+      if (val === 3 && this.form.sso === true) {
+        this.rules.entity_id[0].required = true
+        this.rules.certificate[0].required = true
+      } else {
+        this.rules.entity_id[0].required = false
+        this.rules.certificate[0].required = false
+        this.$refs.form.clearValidate()
       }
     }
   },
   created() {
     // 初始化logoPreview为默认图片
     this.logoPreview = undefined
+
+    // 设置必选
+    if (this.form.sso === true) {
+      this.rules.sso_type[0].required = true
+      this.rules.callback_url[0].required = true
+      if (this.form.sso_type === 3) {
+        this.rules.entity_id[0].required = true
+        this.rules.certificate[0].required = true
+      }
+    }
 
     if (this.form.id !== undefined && this.form.icon !== '') {
       this.logoPreview = this.form.icon
@@ -182,6 +241,21 @@ export default {
       }
       // 清空fileList，否则无法更改图片
       this.$refs.upload.clearFiles()
+    },
+
+    /* 解析SP Metadata */
+    handleMetadata() {
+      ParseSPMetadata({ 'sp_metadata_url': this.form.sp_metadata_url }).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.form.certificate = res.data.certificate
+          this.form.entity_id = res.data.entity_id
+        }
+      })
     },
 
     /* 提交表单 */

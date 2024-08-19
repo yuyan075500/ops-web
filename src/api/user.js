@@ -17,6 +17,33 @@ export function logout() {
   })
 }
 
+// OAuth2授权
+export function GetOAuthAuthorize(data) {
+  return request({
+    url: '/api/v1/sso/oauth/authorize',
+    method: 'post',
+    data
+  })
+}
+
+// OAuth2授权
+export function GetCASAuthorize(data) {
+  return request({
+    url: '/api/v1/sso/cas/authorize',
+    method: 'post',
+    data
+  })
+}
+
+// OAuth2授权
+export function GetSAMLAuthorize(data) {
+  return request({
+    url: '/api/v1/sso/saml/authorize',
+    method: 'post',
+    data
+  })
+}
+
 // 获取当前登录的用户信息
 export function getUserInfo() {
   return request({

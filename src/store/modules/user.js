@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo, mfaAuth } from '@/api/user'
+import { login, logout, getUserInfo, mfaAuth, GetSAMLAuthorize, GetCASAuthorize, GetOAuthAuthorize } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -82,6 +82,39 @@ const actions = {
           setToken(token)
           resolve(response)
         }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 获取SAML授权
+  get_saml_authorize({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      GetSAMLAuthorize(formData).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 获取CAS授权
+  get_cas_authorize({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      GetCASAuthorize(formData).then(response => {
+        window.location.href = response.redirect_uri
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 获取OAuth授权
+  get_oauth_authorize({ commit }, formData) {
+    return new Promise((resolve, reject) => {
+      GetOAuthAuthorize(formData).then(response => {
+        window.location.href = response.redirect_uri
       }).catch(error => {
         reject(error)
       })

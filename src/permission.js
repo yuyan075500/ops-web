@@ -6,9 +6,6 @@ import { getToken } from '@/utils/auth' // 从cookie获取token
 import getPageTitle from '@/utils/get-page-title'
 import Layout from '@/layout'
 import getParameterByName from '@/utils/url'
-import { OAuthAuthorize } from '@/api/sso/oauth'
-import { CASAuthorize } from '@/api/sso/cas'
-import { SAMLAuthorize } from '@/api/sso/saml'
 
 const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 
@@ -36,23 +33,24 @@ router.beforeEach(async(to, from, next) => {
       const saml_request = getParameterByName('SAMLRequest')
 
       if (client_id) {
-        // to.query可以获取到当前路由中的query参数
-        OAuthAuthorize(to.query).then(res => {
-          if (res.code === 0) {
-            // 跳转到客户端
-            window.location.href = res.redirect_uri
-          }
-        })
+        // 获取CAS授权
+        await store.dispatch('user/get_oauth_authorize', to.query)
       } else if (service) {
-        // to.query可以获取到当前路由中的query参数
-        CASAuthorize(to.query).then(res => {
-          if (res.code === 0) {
-            // 跳转到客户端
-            window.location.href = res.redirect_uri
-          }
-        })
+        // 获取CAS授权
+        await store.dispatch('user/get_cas_authorize', to.query)
       } else if (saml_request) {
-        SAMLAuthorize(to.query).then(res => {})
+        // 获取SAML授权
+        const authorize = await store.dispatch('user/get_saml_authorize', to.query)
+        // 将授权HTML插入到当前页面的DOM中
+        const div = document.createElement('div')
+        div.innerHTML = authorize.data
+        document.body.appendChild(div)
+        // 获取表单（saml这个ID是后端定义好后返回的）
+        const form = div.querySelector('#saml')
+        // 提交表单
+        if (form) {
+          form.submit()
+        }
       } else {
         // 本地认证处理逻辑
         next({ path: '/' })

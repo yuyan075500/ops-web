@@ -52,12 +52,7 @@ router.beforeEach(async(to, from, next) => {
           }
         })
       } else if (saml_request) {
-        SAMLAuthorize(to.query).then(res => {
-          if (res.code === 0) {
-            // 跳转到客户端
-            window.location.href = res.redirect_uri
-          }
-        })
+        SAMLAuthorize(to.query).then(res => {})
       } else {
         // 本地认证处理逻辑
         next({ path: '/' })

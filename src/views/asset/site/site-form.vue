@@ -52,7 +52,7 @@
       </el-col>
       <el-col :span="4">
         <el-form-item label-width="0px">
-          <el-button type="primary" size="mini" :loading="loading" :disabled="form.sso_type !== 3" @click="handleMetadata">获 取</el-button>
+          <el-button type="primary" size="mini" :loading="loading" :disabled="form.sso_type !== 3 || form.sso === false" @click="handleMetadata">获 取</el-button>
         </el-form-item>
       </el-col>
     </el-row>

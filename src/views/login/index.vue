@@ -130,9 +130,24 @@ export default {
 
           // 执行登录
           this.$store.dispatch('user/login', newForm).then((res) => {
-            // redirect_uri表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
+            // redirect_uri表示SSO客户端在进行单点登录认证
             if (res.redirect_uri !== undefined) {
-              window.location.href = res.redirect_uri
+              // SAML认证
+              if (newForm.SAMLRequest) {
+                // 将授权HTML插入到当前页面的DOM中
+                const div = document.createElement('div')
+                div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+                document.body.appendChild(div)
+                // 获取表单（saml这个ID是后端定义好后返回的）
+                const form = div.querySelector('#saml')
+                // 提交表单
+                if (form) {
+                  form.submit()
+                }
+              } else {
+                // CAS3.0和OAuth2.0认证
+                window.location.href = res.redirect_uri
+              }
             }
 
             // redirect表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面

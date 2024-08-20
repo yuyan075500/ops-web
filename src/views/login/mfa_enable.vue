@@ -106,7 +106,22 @@ export default {
           this.$store.dispatch('user/mfa_auth', newForm).then((res) => {
             // redirect_uri表示SSO客户端在进行单点登录认证，直接跳转至客户回调地址
             if (res.redirect_uri) {
-              window.location.href = res.redirect_uri
+              // SAML认证
+              if (newForm.SAMLRequest) {
+                // 将授权HTML插入到当前页面的DOM中
+                const div = document.createElement('div')
+                div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+                document.body.appendChild(div)
+                // 获取表单（saml这个ID是后端定义好后返回的）
+                const form = div.querySelector('#saml')
+                // 提交表单
+                if (form) {
+                  form.submit()
+                }
+              } else {
+                // CAS3.0和OAuth2.0认证
+                window.location.href = res.redirect_uri
+              }
             }
 
             this.$router.push({ path: this.redirect || '/' })

@@ -33,7 +33,7 @@ router.beforeEach(async(to, from, next) => {
       const saml_request = getParameterByName('SAMLRequest')
 
       if (client_id) {
-        // 获取CAS授权
+        // 获取OAuth授权
         await store.dispatch('user/get_oauth_authorize', to.query)
       } else if (service) {
         // 获取CAS授权

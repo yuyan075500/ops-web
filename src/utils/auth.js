@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'aops_token'
+// 前端存储的Cookie名称
+const TokenKey = 'door_token'
 
 export function getToken() {
   return Cookies.get(TokenKey)

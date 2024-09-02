@@ -100,7 +100,10 @@ export default {
   },
   mounted() {
     // 钉钉二维码初始化
-    this.ddQrcodeinInit()
+    console.log(process.env.VUE_APP_DINGTALK_CLIENT_ID)
+    if (process.env.VUE_APP_DINGTALK_CLIENT_ID !== '') {
+      this.ddQrcodeinInit()
+    }
   },
   methods: {
 

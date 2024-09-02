@@ -1,4 +1,4 @@
-FROM nginx:1.21-alpine
+FROM swr.cn-east-3.myhuaweicloud.com/lansefenbao/nginx:1.27
 
 WORKDIR /usr/share/nginx/html
 

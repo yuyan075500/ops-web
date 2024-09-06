@@ -171,8 +171,8 @@ export default {
       'phone_number'
     ]),
     uploadUrl() {
-      if (process.env.VUE_APP_BASE_API === '\'') {
-        return '/api/v1/user/avatarUpload'
+      if (process.env.VUE_APP_BASE_API === '/') {
+        return window.location.protocol + '//' + window.location.hostname + '/api/v1/user/avatarUpload'
       } else {
         return process.env.VUE_APP_BASE_API + '/api/v1/user/avatarUpload'
       }

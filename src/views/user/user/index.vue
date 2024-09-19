@@ -17,7 +17,7 @@
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAddUser">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-refresh" size="mini" @click="handleUserSync">AD域账号同步</el-button>
+        <el-button type="primary" plain icon="el-icon-refresh" size="mini" @click="handleUserSync">LDAP账号同步</el-button>
       </el-col>
     </el-row>
 
@@ -206,7 +206,7 @@ export default {
 
     /* AD域用户同步 */
     handleUserSync() {
-      this.$confirm('点击确认将从AD中同步用户信息，你还可以了解更详细的同步规则。', '提示', {
+      this.$confirm('点击确认将从LDAP中同步用户信息，你还可以了解更详细的同步规则。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -247,7 +247,7 @@ export default {
 
     /* 删除用户 */
     handleDelete(rowData) {
-      this.$confirm('点击确认当前用户将从系统中永久删除。', '提示', {
+      this.$confirm('点击确认当前用户将从本系统中永久删除。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',

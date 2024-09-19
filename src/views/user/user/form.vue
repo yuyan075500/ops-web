@@ -15,12 +15,13 @@
     <el-row>
       <el-col :span="12">
         <el-form-item label="邮箱地址：" prop="email">
-          <el-input v-model="form.email" autocomplete="off" clearable />
+          <el-input v-model="form.email" autocomplete="off" :disabled="form.user_from !== '本地'" clearable />
+          <div v-if="form.user_from !== '本地'" class="help-block" style="color: #999; font-size: 12px">非本地用户不支持更改个人信息</div>
         </el-form-item>
       </el-col>
       <el-col :span="12">
         <el-form-item label="手机号：" prop="phone_number">
-          <el-input v-model.number="form.phone_number" autocomplete="off" clearable />
+          <el-input v-model.number="form.phone_number" :disabled="form.user_from !== '本地'" autocomplete="off" clearable />
         </el-form-item>
       </el-col>
     </el-row>

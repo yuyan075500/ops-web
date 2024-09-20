@@ -3,7 +3,7 @@
     <el-form ref="form" class="login-form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="left" label-width="110px">
       <div class="title-container">
         <h3 class="title">MFA认证绑定</h3>
-        <h5 class="note">请使用Google身份验证器扫描下方二维码，获取6位数字验证码</h5>
+        <h5 class="note">使用Google身份验器、阿里云或华为云APP扫描二维码，获取6位数字验证码</h5>
       </div>
 
       <div class="block" style="text-align: center;margin-bottom: 25px">

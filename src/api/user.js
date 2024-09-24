@@ -9,6 +9,15 @@ export function login(data) {
   })
 }
 
+// 钉钉扫码登录
+export function GetDingTalkAuthorize(data) {
+  return request({
+    url: '/api/auth/dingtalk_login',
+    method: 'post',
+    data
+  })
+}
+
 // 用户注销
 export function logout() {
   return request({
@@ -26,7 +35,7 @@ export function GetOAuthAuthorize(data) {
   })
 }
 
-// OAuth2授权
+// CAS授权
 export function GetCASAuthorize(data) {
   return request({
     url: '/api/v1/sso/cas/authorize',
@@ -35,7 +44,7 @@ export function GetCASAuthorize(data) {
   })
 }
 
-// OAuth2授权
+// SAML2授权
 export function GetSAMLAuthorize(data) {
   return request({
     url: '/api/v1/sso/saml/authorize',

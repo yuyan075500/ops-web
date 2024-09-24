@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { generateState } from '@/utils/generate-stata'
+
 export default {
   name: 'Login',
   data() {
@@ -72,7 +74,8 @@ export default {
       },
       // 钉钉扫码认证相关参数
       dingtalk: {
-        redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login' // 认证成功后的回调地址
+        redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login', // 认证成功后的回调地址
+        state: generateState()
       },
       // 用户名密码登录表单验证规则
       loginRules: {
@@ -100,7 +103,6 @@ export default {
   },
   mounted() {
     // 钉钉二维码初始化
-    console.log(process.env.VUE_APP_DINGTALK_CLIENT_ID)
     if (process.env.VUE_APP_DINGTALK_CLIENT_ID !== '') {
       this.ddQrcodeinInit()
     }
@@ -194,13 +196,49 @@ export default {
           client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
-          state: 'aops', // 固定值，认证成功后会原样返回
+          state: this.dingtalk.state, // 固定值，认证成功后会原样返回
           prompt: 'consent' // 固定值
         },
         (loginResult) => {
-          // 向钉钉认证成功后的动作
-          const { redirectUrl } = loginResult
-          window.location.href = redirectUrl
+          // 获取扫码认证成功后的数据
+          const { authCode, state } = loginResult
+
+          // 判断状态是否一致
+          if (this.dingtalk.state !== state) {
+            this.$message.error('状态不一致')
+            return false
+          }
+
+          // 授权URL请求参数设定
+          const newForm = {
+            authCode: authCode,
+            ...this.$route.query
+          }
+
+          // 钉钉登录授权
+          this.$store.dispatch('user/get_dingtalk_authorize', newForm).then((res) => {
+            // redirect_uri表示SSO客户端在进行单点登录认证
+            if (res.redirect_uri !== undefined) {
+              // SAML认证
+              if (newForm.SAMLRequest) {
+                // 将授权HTML插入到当前页面的DOM中
+                const div = document.createElement('div')
+                div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+                document.body.appendChild(div)
+                // 获取表单（saml这个ID是后端定义好后返回的）
+                const form = div.querySelector('#saml')
+                // 提交表单
+                if (form) {
+                  form.submit()
+                }
+              } else {
+                // CAS3.0和OAuth2.0认证
+                window.location.href = res.redirect_uri
+              }
+            }
+
+            this.$router.push({ path: this.redirect || '/' })
+          }).catch(() => {})
         },
         (errorMsg) => {
           // 登录失败的原因

@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">信息化统一认证</h3>
+        <h3 class="title">统一认证中心</h3>
       </div>
 
       <el-tabs v-model="active" :stretch="stretch" @tab-click="handleTabClick">
@@ -58,7 +58,7 @@
           </div>
         </el-tab-pane>
       </el-tabs>
-      <div class="tips"><span>2024 © Power By IT&运维 使用chrome获得最佳体验</span></div>
+      <div class="tips"><span>2024 © Power By 蓝色风暴 使用chrome获得最佳体验</span></div>
     </el-form>
   </div>
 </template>
@@ -213,7 +213,7 @@ export default {
         id: 'ww_login',
         appid: process.env.VUE_APP_WECHAT_APP_ID,
         agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
-        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri),
+        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
         state: this.qrcode.state,
         href: `data:text/css;base64,${Base64.encode(
           `.impowerBox .title {display: none;}

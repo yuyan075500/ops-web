@@ -5,7 +5,6 @@ import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // 从cookie获取token
 import getPageTitle from '@/utils/get-page-title'
 import Layout from '@/layout'
-import getParameterByName from '@/utils/url'
 
 const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组件的方法
 
@@ -27,18 +26,16 @@ router.beforeEach(async(to, from, next) => {
   // 确认用户是否登录
   if (hasToken) {
     if (to.path === '/login') {
-      // 如果URL的Query中有service或client_id参数，则需要进行SSO认证
-      const service = getParameterByName('service')
-      const client_id = getParameterByName('client_id')
-      const saml_request = getParameterByName('SAMLRequest')
+      // 获取URL的Query参数
+      const query = to.query
 
-      if (client_id) {
+      if ('client_id' in query) {
         // 获取OAuth授权
         await store.dispatch('user/get_oauth_authorize', to.query)
-      } else if (service) {
+      } else if ('service' in query) {
         // 获取CAS授权
         await store.dispatch('user/get_cas_authorize', to.query)
-      } else if (saml_request) {
+      } else if ('saml_request' in query) {
         // 获取SAML授权
         const authorize = await store.dispatch('user/get_saml_authorize', to.query)
         // 将授权HTML插入到当前页面的DOM中
@@ -85,6 +82,33 @@ router.beforeEach(async(to, from, next) => {
     }
   } else {
     /* 如果没有Token */
+
+    // 获取URL的Query参数
+    const query = to.query
+    // 企业微信认证
+    if ('code' in query && 'appid' in query && 'state' in query) {
+      const res = await store.dispatch('user/get_ww_authorize', query)
+
+      // redirect_uri表示SSO客户端在进行单点登录认证
+      if (res.redirect_uri !== undefined) {
+        // SAML认证
+        if (query.SAMLRequest) {
+          // 将授权HTML插入到当前页面的DOM中
+          const div = document.createElement('div')
+          div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+          document.body.appendChild(div)
+          // 获取表单（saml这个ID是后端定义好后返回的）
+          const form = div.querySelector('#saml')
+          // 提交表单
+          if (form) {
+            form.submit()
+          }
+        } else {
+          // CAS3.0和OAuth2.0认证
+          window.location.href = res.redirect_uri
+        }
+      }
+    }
 
     if (whiteList.indexOf(to.path) !== -1) {
       // 如果访问的URL在免登录白名单，则直接跳转

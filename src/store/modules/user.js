@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo, mfaAuth, GetSAMLAuthorize, GetCASAuthorize, GetOAuthAuthorize, GetDingTalkAuthorize } from '@/api/user'
+import { login, logout, getUserInfo, mfaAuth, GetSAMLAuthorize, GetCASAuthorize, GetOAuthAuthorize, GetDingTalkAuthorize, GetWeChatAuthorize } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -92,6 +92,22 @@ const actions = {
   get_dingtalk_authorize({ commit }, userInfo) {
     return new Promise((resolve, reject) => {
       GetDingTalkAuthorize(userInfo).then(response => {
+        const { token } = response
+        // 将token存储到vuex中
+        commit('SET_TOKEN', token)
+        // 将token存储到cookie中
+        setToken(token)
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 获取钉钉授权
+  get_ww_authorize({ commit }, userInfo) {
+    return new Promise((resolve, reject) => {
+      GetWeChatAuthorize(userInfo).then(response => {
         const { token } = response
         // 将token存储到vuex中
         commit('SET_TOKEN', token)

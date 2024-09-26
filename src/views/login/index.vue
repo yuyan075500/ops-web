@@ -45,15 +45,17 @@
 
           <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">登录</el-button>
         </el-tab-pane>
-        <el-tab-pane label="钉钉扫码登录" name="qrcode" class="qrcode">
+        <el-tab-pane label="钉钉扫码登录" name="dd" class="qrcode">
           <div id="qrcode" />
           <div class="tip-qrcode">
             扫描二维码登录，点击二维码可刷新
           </div>
         </el-tab-pane>
+        <el-tab-pane label="企业微信扫码登录" name="ww" class="qrcode">
+          <div id="ww_login" />
+        </el-tab-pane>
       </el-tabs>
       <div class="tips"><span>2024 © Power By IT&运维 使用chrome获得最佳体验</span></div>
-
     </el-form>
   </div>
 </template>
@@ -72,8 +74,8 @@ export default {
         username: '',
         password: ''
       },
-      // 钉钉扫码认证相关参数
-      dingtalk: {
+      // 扫码认证相关参数（适用于钉钉、企业微信）
+      qrcode: {
         redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login', // 认证成功后的回调地址
         state: generateState()
       },
@@ -104,7 +106,12 @@ export default {
   mounted() {
     // 钉钉二维码初始化
     if (process.env.VUE_APP_DINGTALK_CLIENT_ID !== '') {
-      this.ddQrcodeinInit()
+      this.ddQrcodeInit()
+    }
+
+    // 企业微信二维码初始化
+    if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
+      this.wechatQrcodeInit(this.$route.query)
     }
   },
   methods: {
@@ -179,10 +186,64 @@ export default {
       })
     },
 
-    /* 钉钉二维码始、扫码成功后的动作 */
-    ddQrcodeinInit() {
+    /* 企业微信二维码初始化 */
+    wechatQrcodeInit(query) {
+      // 保存 this 的引用
+      const self = this
+
+      // 初始化登录组件
+      window.ww.createWWLoginPanel({
+        el: '#ww_login',
+        params: {
+          login_type: 'CorpApp',
+          appid: process.env.VUE_APP_WECHAT_APP_ID,
+          agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
+          redirect_uri: this.qrcode.redirect_uri,
+          state: this.qrcode.state,
+          redirect_type: 'callback'
+        },
+        onLoginSuccess({ code }) {
+          // 授权URL请求参数设定
+          const newForm = {
+            code: code,
+            ...self.$route.query
+          }
+
+          self.$store.dispatch('user/get_ww_authorize', newForm).then((res) => {
+            // redirect_uri表示SSO客户端在进行单点登录认证
+            if (res.redirect_uri !== undefined) {
+              // SAML认证
+              if (newForm.SAMLRequest) {
+                // 将授权HTML插入到当前页面的DOM中
+                const div = document.createElement('div')
+                div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+                document.body.appendChild(div)
+                // 获取表单（saml这个ID是后端定义好后返回的）
+                const form = div.querySelector('#saml')
+                // 提交表单
+                if (form) {
+                  form.submit()
+                }
+              } else {
+                // CAS3.0和OAuth2.0认证
+                window.location.href = res.redirect_uri
+              }
+            }
+
+            self.$router.push({ path: this.redirect || '/' })
+          }).catch(() => {})
+        },
+        onLoginFail(err) {
+          // 登录失败的原因
+          alert(`Login Error: ${err}`)
+        }
+      })
+    },
+
+    /* 钉钉二维码初始化、扫码成功后的动作 */
+    ddQrcodeInit() {
       if (window.location.port !== '80' && window.location.port !== '443') {
-        this.dingtalk.redirect_uri = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/login'
+        this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/login'
       }
       window.DTFrameLogin(
         // 二维码容器相关参数：绑定的容器id、宽度、高度
@@ -192,11 +253,11 @@ export default {
           height: 240 // 二维码容器高度
         },
         {
-          redirect_uri: encodeURIComponent(this.dingtalk.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
+          redirect_uri: encodeURIComponent(this.qrcode.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
           client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
-          state: this.dingtalk.state, // 固定值，认证成功后会原样返回
+          state: this.qrcode.state, // 固定值，认证成功后会原样返回
           prompt: 'consent' // 固定值
         },
         (loginResult) => {
@@ -204,7 +265,7 @@ export default {
           const { authCode, state } = loginResult
 
           // 判断状态是否一致
-          if (this.dingtalk.state !== state) {
+          if (this.qrcode.state !== state) {
             this.$message.error('状态不一致')
             return false
           }
@@ -337,7 +398,7 @@ $light_gray:#eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+    padding: 130px 35px 0;
     margin: 0 auto;
     overflow: hidden;
   }
@@ -346,7 +407,6 @@ $light_gray:#eee;
     font-size: 14px;
     text-align: center;
     color: #fff;
-    margin-bottom: 10px;
   }
 
   .svg-container {

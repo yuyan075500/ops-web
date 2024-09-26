@@ -18,6 +18,15 @@ export function GetDingTalkAuthorize(data) {
   })
 }
 
+// 企业微信扫码登录
+export function GetWeChatAuthorize(data) {
+  return request({
+    url: '/api/auth/ww_login',
+    method: 'post',
+    data
+  })
+}
+
 // 用户注销
 export function logout() {
   return request({

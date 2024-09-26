@@ -6,7 +6,7 @@
         <h3 class="title">信息化统一认证</h3>
       </div>
 
-      <el-tabs v-model="active" :stretch="stretch">
+      <el-tabs v-model="active" :stretch="stretch" @tab-click="handleTabClick">
         <el-tab-pane label="账号密码登录" name="username">
           <el-form-item prop="username">
             <span class="svg-container">
@@ -107,6 +107,13 @@ export default {
       immediate: true
     }
   },
+  created() {
+    // 页面加载时从缓存中获取上次选择的登录方式
+    const savedTab = localStorage.getItem('defaultLoginTag')
+    if (savedTab) {
+      this.active = savedTab
+    }
+  },
   mounted() {
     // 获取企业微信和钉钉的回调地址
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
@@ -122,6 +129,12 @@ export default {
     }
   },
   methods: {
+
+    /* 当用户切换Tab */
+    handleTabClick(tab) {
+      // 保存当前选项到localStorage
+      localStorage.setItem('defaultLoginTag', tab.name)
+    },
 
     /* 密码显示与隐藏 */
     showPwd() {

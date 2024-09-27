@@ -2,7 +2,7 @@
 import { generateState } from '@/utils/generate-stata'
 export function FeishuQrLogin() {
   // 指定回调地址
-  const redirect_uri = window.location.protocol + '//' + window.location.hostname + '/login' + window.location.search
+  const redirect_uri = window.location.protocol + '//' + window.location.host + '/login' + window.location.search
 
   // 组装二维码获取接口地址
   const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${process.env.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&state=${generateState()}`

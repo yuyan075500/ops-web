@@ -83,33 +83,6 @@ router.beforeEach(async(to, from, next) => {
   } else {
     /* 如果没有Token */
 
-    // 获取URL的Query参数
-    const query = to.query
-    // 企业微信认证
-    if ('code' in query && 'appid' in query && 'state' in query) {
-      const res = await store.dispatch('user/get_ww_authorize', query)
-
-      // redirect_uri表示SSO客户端在进行单点登录认证
-      if (res.redirect_uri !== undefined) {
-        // SAML认证
-        if (query.SAMLRequest) {
-          // 将授权HTML插入到当前页面的DOM中
-          const div = document.createElement('div')
-          div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
-          document.body.appendChild(div)
-          // 获取表单（saml这个ID是后端定义好后返回的）
-          const form = div.querySelector('#saml')
-          // 提交表单
-          if (form) {
-            form.submit()
-          }
-        } else {
-          // CAS3.0和OAuth2.0认证
-          window.location.href = res.redirect_uri
-        }
-      }
-    }
-
     if (whiteList.indexOf(to.path) !== -1) {
       // 如果访问的URL在免登录白名单，则直接跳转
       next()

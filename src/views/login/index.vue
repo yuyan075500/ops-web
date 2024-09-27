@@ -122,7 +122,15 @@ export default {
     }
   },
   mounted() {
-    // 获取企业微信和钉钉的回调地址
+    // 获取路由参数
+    const query = this.$route.query
+
+    // 企业微信认证
+    if ('code' in query && 'appid' in query && 'state' in query) {
+      this.handleWwLogin(query)
+    }
+
+    // 获取扫码登录回调地址
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
 
     // 钉钉二维码初始化
@@ -132,7 +140,19 @@ export default {
 
     // 企业微信二维码初始化
     if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
-      this.wechatQrcodeInit()
+      // 初始化登录组件
+      new window.WwLogin({
+        id: 'ww_login',
+        appid: process.env.VUE_APP_WECHAT_APP_ID,
+        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
+        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
+        state: this.qrcode.state,
+        href: `data:text/css;base64,${Base64.encode(
+          `.impowerBox .title {display: none;}
+          .impowerBox .info {display: none;}
+          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
+        )}`
+      })
     }
 
     // 飞书二维码初始化
@@ -160,7 +180,7 @@ export default {
       })
     },
 
-    /* 登录按钮 */
+    /* 普通登录按钮 */
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
@@ -218,24 +238,31 @@ export default {
       })
     },
 
-    /* 企业微信二维码初始化（旧版本：支持传入样式），文档：https://developer.work.weixin.qq.com/document/15056 */
-    wechatQrcodeInit() {
-      // 初始化登录组件
-      var wwLogin = new window.WwLogin({
-        id: 'ww_login',
-        appid: process.env.VUE_APP_WECHAT_APP_ID,
-        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
-        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
-        state: this.qrcode.state,
-        href: `data:text/css;base64,${Base64.encode(
-          `.impowerBox .title {display: none;}
-          .impowerBox .info {display: none;}
-          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
-        )}`
-      })
+    /* 企业微信扫码登录 */
+    handleWwLogin(query) {
+      this.$store.dispatch('user/get_ww_authorize', query).then((res) => {
+        // redirect_uri表示SSO客户端在进行单点登录认证
+        if (res.redirect_uri !== undefined) {
+          // SAML认证
+          if (query.SAMLRequest) {
+            // 将授权HTML插入到当前页面的DOM中
+            const div = document.createElement('div')
+            div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+            document.body.appendChild(div)
+            // 获取表单（saml这个ID是后端定义好后返回的）
+            const form = div.querySelector('#saml')
+            // 提交表单
+            if (form) {
+              form.submit()
+            }
+          } else {
+            // CAS3.0和OAuth2.0认证
+            window.location.href = res.redirect_uri
+          }
+        }
 
-      // 实例化
-      wwLogin.destroyed()
+        this.$router.push({ path: this.redirect || '/' })
+      }).catch(() => {})
     },
 
     /* 钉钉二维码初始化、扫码成功后的动作 */

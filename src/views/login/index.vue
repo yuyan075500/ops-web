@@ -7,7 +7,7 @@
       </div>
 
       <el-tabs v-model="active" :stretch="stretch" @tab-click="handleTabClick">
-        <el-tab-pane label="账号密码登录" name="username">
+        <el-tab-pane label="账号密码" name="username">
           <el-form-item prop="username">
             <span class="svg-container">
               <svg-icon icon-class="user" />
@@ -45,16 +45,22 @@
 
           <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">登录</el-button>
         </el-tab-pane>
-        <el-tab-pane label="钉钉扫码登录" name="dd" class="qrcode">
-          <div id="qrcode" class="qrcode-container" />
+        <el-tab-pane label="钉钉扫码" name="dd" class="qrcode">
+          <div id="dd_qrcode" class="qrcode-container" />
           <div class="tip-qrcode">
             使用钉钉扫描上方二维码登录
           </div>
         </el-tab-pane>
-        <el-tab-pane label="企业微信扫码登录" name="ww" class="qrcode">
+        <el-tab-pane label="企业微信扫码" name="ww" class="qrcode">
           <div id="ww_login" class="qrcode-container" />
           <div class="tip-qrcode">
             使用企业微信扫描上方二维码登录
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="飞书扫码" name="feishu" class="qrcode">
+          <div id="feishu_login" class="qrcode-container" />
+          <div class="tip-qrcode">
+            使用飞书扫描上方二维码登录
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -64,6 +70,7 @@
 </template>
 
 <script>
+import { FeishuQrLogin } from '@/utils/feishu'
 import { Base64 } from 'js-base64'
 import { generateState } from '@/utils/generate-stata'
 
@@ -126,6 +133,11 @@ export default {
     // 企业微信二维码初始化
     if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
       this.wechatQrcodeInit()
+    }
+
+    // 飞书二维码初始化
+    if (process.env.VUE_APP_FEISHU_CLIENT_ID !== '') {
+      FeishuQrLogin()
     }
   },
   methods: {
@@ -231,7 +243,7 @@ export default {
       window.DTFrameLogin(
         // 二维码容器相关参数：绑定的容器id、宽度、高度
         {
-          id: 'qrcode', // 二维码容器id
+          id: 'dd_qrcode', // 二维码容器id
           width: 280, // 二维码容器宽度
           height: 280 // 二维码容器高度
         },
@@ -314,7 +326,7 @@ $cursor: #fff;
   }
 
   .tip-qrcode {
-    padding-top: 10px;
+    padding-top: 15px;
     padding-bottom: 20px;
     font-size: 12.5px;
     margin-bottom: 20px;

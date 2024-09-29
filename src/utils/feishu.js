@@ -3,6 +3,7 @@ import { generateState } from '@/utils/generate-stata'
 export function FeishuQrLogin() {
   // 指定回调地址
   const redirect_uri = window.location.protocol + '//' + window.location.host + '/login' + window.location.search
+  console.log(redirect_uri)
 
   // 组装二维码获取接口地址
   const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${process.env.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=code&state=${generateState()}`
@@ -20,7 +21,7 @@ export function FeishuQrLogin() {
     if (QRLoginObj.matchOrigin(event.origin) && QRLoginObj.matchData(event.data)) {
       const loginTmpCode = event.data.tmp_code
       // 在授权页面地址上拼接上参数tmp_code，并跳转
-      window.location.href = `${redirect_uri}&code=${loginTmpCode}`
+      window.location.href = `${goto}&tmp_code=${loginTmpCode}`
     }
   }
 

@@ -19,7 +19,7 @@
         </el-form-item>
       </el-col>
       <el-col :span="14">
-        <el-form-item label="认证类似：" prop="sso_type">
+        <el-form-item label="认证类型：" prop="sso_type">
           <el-radio-group v-model="form.sso_type">
             <el-radio :label="1">CAS3.0</el-radio>
             <el-radio :label="2">OAuth2</el-radio>

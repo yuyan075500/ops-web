@@ -1,4 +1,4 @@
-import { login, logout, getUserInfo, mfaAuth, GetSAMLAuthorize, GetCASAuthorize, GetOAuthAuthorize, GetDingTalkAuthorize, GetWeChatAuthorize } from '@/api/user'
+import { login, logout, getUserInfo, mfaAuth, GetSAMLAuthorize, GetCASAuthorize, GetOAuthAuthorize, GetDingTalkAuthorize, GetWeChatAuthorize, GetFeishuAuthorize } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -104,10 +104,26 @@ const actions = {
     })
   },
 
-  // 获取钉钉授权
+  // 获取企业微信授权
   get_ww_authorize({ commit }, userInfo) {
     return new Promise((resolve, reject) => {
       GetWeChatAuthorize(userInfo).then(response => {
+        const { token } = response
+        // 将token存储到vuex中
+        commit('SET_TOKEN', token)
+        // 将token存储到cookie中
+        setToken(token)
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  // 获取飞书授权
+  get_feishu_authorize({ commit }, userInfo) {
+    return new Promise((resolve, reject) => {
+      GetFeishuAuthorize(userInfo).then(response => {
         const { token } = response
         // 将token存储到vuex中
         commit('SET_TOKEN', token)

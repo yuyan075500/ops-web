@@ -27,6 +27,15 @@ export function GetWeChatAuthorize(data) {
   })
 }
 
+// 飞书扫码登录
+export function GetFeishuAuthorize(data) {
+  return request({
+    url: '/api/auth/feishu_login',
+    method: 'post',
+    data
+  })
+}
+
 // 用户注销
 export function logout() {
   return request({

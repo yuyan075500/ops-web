@@ -127,7 +127,12 @@ export default {
 
     // 企业微信认证
     if ('code' in query && 'appid' in query && 'state' in query) {
-      this.handleWwLogin(query)
+      this.handleWwLogin()
+    }
+
+    // 飞书认证
+    if ('code' in query && 'byte' in query && 'state' in query) {
+      this.handleFeishuLogin()
     }
 
     // 获取扫码登录回调地址
@@ -238,13 +243,50 @@ export default {
       })
     },
 
-    /* 企业微信扫码登录 */
-    handleWwLogin(query) {
-      this.$store.dispatch('user/get_ww_authorize', query).then((res) => {
+    /* 飞书扫码登录 */
+    handleFeishuLogin() {
+      // 授权URL请求参数设定
+      const newForm = {
+        ...this.$route.query
+      }
+
+      this.$store.dispatch('user/get_feishu_authorize', newForm).then((res) => {
         // redirect_uri表示SSO客户端在进行单点登录认证
         if (res.redirect_uri !== undefined) {
           // SAML认证
-          if (query.SAMLRequest) {
+          if (newForm.SAMLRequest) {
+            // 将授权HTML插入到当前页面的DOM中
+            const div = document.createElement('div')
+            div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+            document.body.appendChild(div)
+            // 获取表单（saml这个ID是后端定义好后返回的）
+            const form = div.querySelector('#saml')
+            // 提交表单
+            if (form) {
+              form.submit()
+            }
+          } else {
+            // CAS3.0和OAuth2.0认证
+            window.location.href = res.redirect_uri
+          }
+        }
+
+        this.$router.push({ path: this.redirect || '/' })
+      }).catch(() => {})
+    },
+
+    /* 企业微信扫码登录 */
+    handleWwLogin() {
+      // 授权URL请求参数设定
+      const newForm = {
+        ...this.$route.query
+      }
+
+      this.$store.dispatch('user/get_ww_authorize', newForm).then((res) => {
+        // redirect_uri表示SSO客户端在进行单点登录认证
+        if (res.redirect_uri !== undefined) {
+          // SAML认证
+          if (newForm.SAMLRequest) {
             // 将授权HTML插入到当前页面的DOM中
             const div = document.createElement('div')
             div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML

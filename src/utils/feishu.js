@@ -13,7 +13,7 @@ export function FeishuQrLogin() {
   const QRLoginObj = window.QRLogin({
     id: 'feishu_login',
     goto: `${goto}`,
-    style: 'width: 251px;height: 251px;border: none'
+    style: 'width: 255px;height: 255px;border: none'
   })
 
   // 监听用户扫码事件

@@ -27,7 +27,7 @@ module.exports = {
   publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
-  lintOnSave: process.env.NODE_ENV === 'development',
+  lintOnSave: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local',
   productionSourceMap: false,
   devServer: {
     disableHostCheck: true, // 禁用主机头检查，开发环境中，如果请求的主机头和项目启动的不一至会报错：Invalid Host header

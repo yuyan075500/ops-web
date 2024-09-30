@@ -1,4 +1,4 @@
-.env.local
+.env.development
 .DS_Store
 node_modules/
 dist/

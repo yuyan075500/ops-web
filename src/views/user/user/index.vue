@@ -195,6 +195,7 @@ export default {
       // 关闭所有Dialog
       this.userAddDialog = false
       this.resetPasswordDialog = false
+      this.wwBindDialog = false
       // 清空表单数据
       this.currentValue = undefined
       this.userId = undefined

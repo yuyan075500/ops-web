@@ -32,6 +32,12 @@
           <div class="help-block" style="color: #999; font-size: 12px"><el-link :underline="false" type="primary" @click="handleGeneratePassword">点击生成随机密码</el-link></div>
         </el-form-item>
       </el-col>
+      <el-col :span="12">
+        <el-form-item label="企业微信ID" prop="ww_id">
+          <el-input v-model="form.ww_id" autocomplete="off" clearable />
+          <div class="help-block" style="color: #999; font-size: 12px">需要登录<el-link type="primary" href="https://work.weixin.qq.com" target="_blank" style="font-size: 12px">企业微信管理后台</el-link>，在通讯录中获取</div>
+        </el-form-item>
+      </el-col>
     </el-row>
     <el-form-item>
       <div>
@@ -56,7 +62,8 @@ export default {
           username: '',
           phone_number: '',
           email: '',
-          password: ''
+          password: '',
+          ww_id: ''
         }
       }
     },
@@ -114,7 +121,7 @@ export default {
         }
 
         // 获取出表单中的数据
-        const { id, username, password, phone_number, email, name, is_active } = this.form
+        const { id, username, password, phone_number, email, name, is_active, ww_id } = this.form
         const data = {
           'id': id,
           'username': username,
@@ -122,6 +129,7 @@ export default {
           'phone_number': phone_number.toString(),
           'email': email,
           'name': name,
+          'ww_id': ww_id,
           'is_active': is_active
         }
 

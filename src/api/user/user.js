@@ -63,7 +63,7 @@ export function resetMFA(data) {
 // 获取校验码
 export function getVerificationCode(data) {
   return request({
-    url: '/api/v1/sms/reset_password_code',
+    url: '/api/v1/sms/reset_password',
     method: 'post',
     data
   })

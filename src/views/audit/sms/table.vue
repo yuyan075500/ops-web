@@ -13,7 +13,12 @@
         <el-tag v-else type="info" size="small">{{ scope.row.status }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column prop="error_code" label="错误码" min-width="3%" />
+    <el-table-column show-overflow-tooltip prop="error_code" label="错误码" min-width="3%" />
+    <el-table-column label="操作" min-width="4%" align="center">
+      <template slot-scope="scope">
+        <el-button size="mini" type="text" @click="handleRefresh(scope.row)">刷新</el-button>
+      </template>
+    </el-table-column>
   </el-table>
 </template>
 
@@ -36,6 +41,11 @@ export default {
     dateFormat: function(row, column) {
       const date = row[column.property]
       return moment(date).format('YYYY-MM-DD HH:mm:ss')
+    },
+
+    /* 刷新短信状态 */
+    handleRefresh(rowData) {
+      this.$emit('refresh', { 'id': rowData.ID })
     }
   }
 }

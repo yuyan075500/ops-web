@@ -15,6 +15,7 @@
     <sms-list-table
       v-loading="loading"
       :table-data="tableData"
+      @refresh="handleRefresh"
     />
 
     <!-- 分页 -->
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-import { getSMSRecordList } from '@/api/audit/log'
+import { getSMSRecordList, getSMSReceipt } from '@/api/audit/log'
 import SmsListTable from './table'
 
 export default {
@@ -82,6 +83,15 @@ export default {
     handlePageChange(newPage) {
       this.queryParams.page = newPage
       this.getList()
+    },
+
+    /* 获取短信发送状态 */
+    handleRefresh(rowData) {
+      getSMSReceipt(rowData).then((res) => {
+        if (res.code === 0) {
+          this.getList()
+        }
+      })
     }
   }
 }

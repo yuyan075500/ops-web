@@ -1,11 +1,11 @@
 <template>
-  <div class="app-container">
+  <div class="site-container">
     <!-- 搜索 -->
     <el-container>
       <el-header class="el-header">
         <el-form :inline="true">
           <el-form-item>
-            <el-input v-model="queryParams.name" class="el-input" placeholder="search..." size="small" clearable>
+            <el-input v-model="queryParams.name" class="el-input" placeholder="Search..." size="small" clearable>
               <template slot="append">
                 <el-button type="primary" @click="searchList">查询</el-button>
               </template>
@@ -80,18 +80,28 @@ export default {
 }
 </script>
 
+<style>
+/* 搜索框高度 */
+.site-container .el-input__inner {
+  height: 40px;
+}
+</style>
+
 <style scoped>
-.app-container{
-  /* 设置背景色 */
+.site-container{
+  /* 搜索页面背景色和边距 */
   background-color: #d0c9c912;
+  padding: 20px;
 }
 .el-header {
-  /* 将搜索表单居中  */
+  /* 搜索表单左右居中  */
   text-align: center;
 }
 .el-input {
-  /* 设置input框的宽度 */
-  width: 350px
+  /* 搜索框宽度 */
+  width: 350px;
+  /* 搜索按钮高度 */
+  height: 40px;
 }
 
 .container {

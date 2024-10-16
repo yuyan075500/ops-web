@@ -11,7 +11,7 @@ const _import = require('./router/_import_' + process.env.NODE_ENV) // 获取组
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 // 免登录白名单URL
-const whiteList = ['/login', '/mfa_enable', '/mfa_auth', '/reset_password']
+const whiteList = ['/login', '/mfa_enable', '/mfa_auth', '/reset_password', '/sites']
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar

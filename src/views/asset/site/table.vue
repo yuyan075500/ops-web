@@ -60,6 +60,11 @@
       </template>
     </el-table-column>
     <el-table-column prop="name" label="分组名称" min-width="20%" />
+    <el-table-column label="站点数" min-width="10%">
+      <template slot-scope="scope">
+        {{ scope.row.sites.length }}
+      </template>
+    </el-table-column>
     <el-table-column label="操作" min-width="10%" align="center">
       <template slot-scope="scope">
         <el-button size="mini" type="text" @click="handleGroupEdit(scope.row)">编辑</el-button>

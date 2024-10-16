@@ -3,6 +3,8 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
+import Layout from '@/layout'
+
 export const constantRoutes = [
   {
     path: '/login',
@@ -25,10 +27,30 @@ export const constantRoutes = [
   },
 
   {
+    path: '/sites',
+    name: 'SITES',
+    component: () => import('@/views/dashboard/index'),
+    hidden: true
+  },
+
+  {
     path: '/reset_password',
     component: () => import('@/views/account/reset_password/index'),
     hidden: true
+  },
+
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    children: [{
+      path: 'dashboard',
+      name: 'Dashboard',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '站点导航', icon: 'sub-menu-site-navigation' }
+    }]
   }
+
 ]
 
 const createRouter = () => new Router({

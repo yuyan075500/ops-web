@@ -10,10 +10,11 @@ export function getGroupList(params) {
 }
 
 // 获取站点列表（站点导航）
-export function getSiteGuideList() {
+export function getSiteGuideList(params) {
   return request({
     url: '/api/v1/site/guide',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 

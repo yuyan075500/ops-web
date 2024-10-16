@@ -3,8 +3,11 @@
 
     <!-- 表格搜索 -->
     <el-form :inline="true">
-      <el-form-item label="查找关键字">
-        <el-input v-model="queryParams.name" placeholder="请输入站名称" size="small" prefix-icon="el-icon-search" clearable />
+      <el-form-item label="分组名">
+        <el-input v-model="queryParams.groupName" placeholder="请输入分组名" size="small" prefix-icon="el-icon-search" clearable />
+      </el-form-item>
+      <el-form-item label="站点名">
+        <el-input v-model="queryParams.siteName" placeholder="请输入站点名或描述信息" size="small" prefix-icon="el-icon-search" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="searchList">查询</el-button>
@@ -127,7 +130,8 @@ export default {
       group: NaN,
       tableData: [],
       queryParams: {
-        name: '',
+        groupName: '',
+        siteName: '',
         page: 1,
         limit: 15
       },

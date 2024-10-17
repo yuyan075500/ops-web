@@ -70,6 +70,23 @@ export function changeSiteUser(data) {
   })
 }
 
+// 修改站点标签
+export function changeSiteTags(data) {
+  return request({
+    url: '/api/v1/site/tags',
+    method: 'put',
+    data
+  })
+}
+
+// 获取标签
+export function getTags(name) {
+  return request({
+    url: '/api/v1/tag/list?name=' + name,
+    method: 'get'
+  })
+}
+
 // 修改站点
 export function changeSite(data) {
   return request({

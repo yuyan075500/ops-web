@@ -52,6 +52,9 @@
                   <el-dropdown-item>
                     <el-button class="el-button-text" size="mini" type="text" @click="handleDetail(scope.row)">站点详情</el-button>
                   </el-dropdown-item>
+                  <el-dropdown-item>
+                    <el-button class="el-button-text" size="mini" type="text" @click="handleTag(scope.row)">站点标签</el-button>
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
@@ -106,6 +109,11 @@ export default {
     /* 显示站点详情 */
     handleDetail(value) {
       this.$emit('detail', value)
+    },
+
+    /* 显示站点详情 */
+    handleTag(value) {
+      this.$emit('tag', value)
     },
 
     /* 删除分组按钮 */

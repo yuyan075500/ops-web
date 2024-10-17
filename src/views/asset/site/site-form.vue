@@ -63,27 +63,31 @@
         </el-form-item>
       </el-col>
     </el-row>
-    <el-form-item label="站点图标：">
-      <el-upload
-        ref="upload"
-        name="icon"
-        class="logo-uploader"
-        accept="image/jpeg,image/jpg,image/png"
-        :headers="{ Authorization: `Bearer ${token}` }"
-        :action="uploadUrl"
-        :limit="1"
-        :multiple="false"
-        :auto-upload="true"
-        :file-list="fileList"
-        :show-file-list="false"
-        :on-success="handleSuccess"
-      >
-        <img v-if="logoPreview !== undefined" :src="logoPreview" class="logo">
-        <img v-else-if="form.icon !== ''" :src="form.icon" class="logo">
-        <img v-else src="../../../assets/web.jpg" class="logo">
-      </el-upload>
-      <div class="help-block" style="color: #999; font-size: 12px; line-height: 0px;">点击图片可更换图标</div>
-    </el-form-item>
+    <el-row>
+      <el-col :span="10">
+        <el-form-item label="站点图标：">
+          <el-upload
+            ref="upload"
+            name="icon"
+            class="logo-uploader"
+            accept="image/jpeg,image/jpg,image/png"
+            :headers="{ Authorization: `Bearer ${token}` }"
+            :action="uploadUrl"
+            :limit="1"
+            :multiple="false"
+            :auto-upload="true"
+            :file-list="fileList"
+            :show-file-list="false"
+            :on-success="handleSuccess"
+          >
+            <img v-if="logoPreview !== undefined" :src="logoPreview" class="logo">
+            <img v-else-if="form.icon !== ''" :src="form.icon" class="logo">
+            <img v-else src="../../../assets/web.jpg" class="logo">
+          </el-upload>
+          <div class="help-block" style="color: #999; font-size: 12px; line-height: 0px;">点击图片可更换图标</div>
+        </el-form-item>
+      </el-col>
+    </el-row>
     <el-form-item>
       <div>
         <el-button size="mini" @click="cancel">取 消</el-button>
@@ -220,7 +224,7 @@ export default {
   },
   methods: {
 
-    /* 图片上传成功回调*/
+    /* 图片上传成功回调 */
     handleSuccess(res, file, fileList) {
       if (res.code === 0) {
         this.$message({
@@ -283,7 +287,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+// 图片样式
 .logo-uploader {
   .el-upload {
     border: 1px dashed #d9d9d9;

@@ -32,6 +32,7 @@
       @delete-site="handleDeleteSite"
       @add="handleAddSite"
       @detail="handleDetail"
+      @tag="handleTag"
       @user="handleEditUser"
     />
 
@@ -62,6 +63,24 @@
         :form="currentValue"
         @close="handleClose"
         @submit="handleGroupSubmit"
+      />
+    </el-dialog>
+
+    <!-- 管理站点标签 -->
+    <el-dialog
+      :title="formTitle"
+      :visible.sync="siteTagDialog"
+      :show-close="false"
+      :close-on-click-modal="false"
+      width="800px"
+      @closed="handleClose"
+    >
+      <site-tag-form
+        ref="form"
+        :loading="loading"
+        :form="currentValue"
+        @close="handleClose"
+        @submit="handleTagSubmit"
       />
     </el-dialog>
 
@@ -106,9 +125,10 @@
 
 <script>
 import { Message } from 'element-ui'
-import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, deleteSite, changeSiteUser } from '@/api/asset/site'
+import { getGroupList, deleteGroup, addGroup, changeGroup, addSite, changeSite, deleteSite, changeSiteUser, changeSiteTags } from '@/api/asset/site'
 import GroupTable from './table'
 import GroupAddForm from './form'
+import SiteTagForm from './tag-form'
 import SiteAddForm from './site-form'
 import SiteInfo from './site-info'
 import AddUserTransfer from './user-transfer'
@@ -119,7 +139,8 @@ export default {
     GroupAddForm,
     SiteAddForm,
     SiteInfo,
-    AddUserTransfer
+    AddUserTransfer,
+    SiteTagForm
   },
   data() {
     return {
@@ -142,7 +163,8 @@ export default {
       groupAddDialog: false,
       siteAddDialog: false,
       userDialog: false,
-      siteInfoDrawer: false
+      siteInfoDrawer: false,
+      siteTagDialog: false
     }
   },
   created() {
@@ -192,6 +214,18 @@ export default {
       this.siteAddDialog = true
       // 更改弹框标题
       this.formTitle = '新增站点'
+      // 赋值group
+      this.group = rowData.id
+    },
+
+    /* 管理站点标签 */
+    handleTag(rowData) {
+      // 打开Dialog
+      this.siteTagDialog = true
+      // 更改弹框标题
+      this.formTitle = '站点标签管理'
+      // 将当前行数据赋值给currentValue
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
       // 赋值group
       this.group = rowData.id
     },
@@ -394,12 +428,31 @@ export default {
       })
     },
 
+    /* 站点标签修改 */
+    handleTagSubmit(formData) {
+      this.loading = true
+      changeSiteTags(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
       this.groupAddDialog = false
       this.siteAddDialog = false
       this.userDialog = false
+      this.siteTagDialog = false
       // 关闭所有Drawer
       this.siteInfoDrawer = false
       // 清空表单数据

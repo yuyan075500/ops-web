@@ -31,6 +31,9 @@
                     </div>
                   </div>
                 </a>
+                <div v-if="item.tags.length > 0" class="item-tag">
+                  <el-tag v-for="(tag, idx) in item.tags" :key="idx" size="mini">{{ tag }}</el-tag>
+                </div>
                 <div class="item-bottom">
                   <a href="" target="_blank">
                     <div>官网地址</div>
@@ -88,6 +91,12 @@ export default {
 </style>
 
 <style scoped>
+.item-tag {
+  display: flex;
+  flex-wrap: wrap; /* 允许标签换行 */
+  gap: 4px; /* 标签之间的间距 */
+  padding: 0px 20px 5px;
+}
 .site-container{
   /* 搜索页面背景色和边距 */
   background-color: #d0c9c912;

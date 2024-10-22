@@ -73,9 +73,9 @@ export default {
       // 控制登录按钮状态
       loading: false,
       // 版权信息
-      copyright: config.copyright,
-      // Title名称
-      title: config.title
+      copyright: process.env.VUE_APP_COPYRIGHT,
+      // 网站名称
+      title: process.env.VUE_APP_TITLE
     }
   },
   watch: {
@@ -87,13 +87,13 @@ export default {
       immediate: true
     }
   },
-  // created() {
-  //   // 页面加载时从缓存中获取上次选择的登录方式
-  //   const savedTab = localStorage.getItem('defaultLoginTag')
-  //   if (savedTab) {
-  //     this.active = savedTab
-  //   }
-  // },
+  created() {
+    // 页面加载时从缓存中获取上次选择的登录方式
+    const savedTab = localStorage.getItem('defaultLoginTag')
+    if (savedTab) {
+      this.active = savedTab
+    }
+  },
   mounted() {
     // 获取路由参数
     const query = this.$route.query
@@ -112,65 +112,50 @@ export default {
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
 
     // 钉钉二维码初始化
-    if (config.dd.enable) {
-      this.dd = true
-      if (config.dd.VUE_APP_DINGTALK_CLIENT_ID !== '') {
-        this.ddQrcodeInit()
-      } else {
-        alert('VUE_APP_DINGTALK_CLIENT_ID 未配置')
-      }
+    if (process.env.VUE_APP_DINGTALK_CLIENT_ID !== '') {
+      this.ddQrcodeInit()
     }
 
     // 企业微信二维码初始化
-    if (config.ww.enable) {
-      this.ww = true
-      if (config.ww.VUE_APP_WECHAT_APP_ID !== '' && config.ww.VUE_APP_WECHAT_AGENT_ID !== '') {
-        // 初始化登录组件
-        new window.WwLogin({
-          id: 'ww_login',
-          appid: config.ww.VUE_APP_WECHAT_APP_ID,
-          agentid: config.ww.VUE_APP_WECHAT_AGENT_ID,
-          redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
-          state: this.qrcode.state,
-          href: `data:text/css;base64,${Base64.encode(
-            `.impowerBox .title {display: none;}
-            .impowerBox .info {display: none;}
-            .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
-          )}`
-        })
-      } else {
-        alert('VUE_APP_WECHAT_APP_ID 或 VUE_APP_WECHAT_AGENT_ID 未配置')
-      }
+    if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
+      // 初始化登录组件
+      new window.WwLogin({
+        id: 'ww_login',
+        appid: process.env.VUE_APP_WECHAT_APP_ID,
+        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
+        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
+        state: this.qrcode.state,
+        href: `data:text/css;base64,${Base64.encode(
+          `.impowerBox .title {display: none;}
+          .impowerBox .info {display: none;}
+          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
+        )}`
+      })
     }
 
     // 飞书二维码初始化
-    if (config.feishu.enable) {
-      this.feishu = true
-      if (config.feishu.VUE_APP_FEISHU_CLIENT_ID !== '') {
-        FeishuQrLogin()
-      } else {
-        alert('VUE_APP_FEISHU_CLIENT_ID 未配置')
-      }
+    if (process.env.VUE_APP_FEISHU_CLIENT_ID !== '') {
+      FeishuQrLogin()
     }
   },
   methods: {
 
     /* 当用户切换Tab */
-    // handleTabClick(tab) {
-    //   // 保存当前选项到localStorage
-    //   localStorage.setItem('defaultLoginTag', tab.name)
-    // },
+    handleTabClick(tab) {
+      // 保存当前选项到localStorage
+      localStorage.setItem('defaultLoginTag', tab.name)
+    },
 
     /* 判断是否显示某个登录方式 */
     isShow(type) {
       if (type === 'dd') {
-        return config.dd.enable
+        return process.env.VUE_APP_DINGTALK_CLIENT_ID !== ''
       }
       if (type === 'ww') {
-        return config.ww.enable
+        return process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== ''
       }
       if (type === 'feishu') {
-        return config.feishu.enable
+        return process.env.VUE_APP_FEISHU_CLIENT_ID !== ''
       }
       return false
     },
@@ -302,7 +287,7 @@ export default {
         },
         {
           redirect_uri: encodeURIComponent(this.qrcode.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
-          client_id: config.dd.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
+          client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
           state: this.qrcode.state, // 固定值，认证成功后会原样返回

@@ -6,7 +6,7 @@ export function FeishuQrLogin() {
   const redirect_uri = window.location.protocol + '//' + window.location.host + '/login?byte=true' + query.replace('?', '&')
 
   // 组装二维码获取接口地址
-  const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${config.feishu.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&state=${generateState()}`
+  const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${process.env.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&state=${generateState()}`
 
   // 请求生成二维码
   const QRLoginObj = window.QRLogin({

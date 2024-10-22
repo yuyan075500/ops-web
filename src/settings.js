@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: config.title,
+  title: process.env.VUE_APP_TITLE,
 
   /**
    * @type {boolean} true | false

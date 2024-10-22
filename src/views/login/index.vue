@@ -1,71 +1,48 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <div class="login-form">
       <div class="title-container">
         <h3 class="title">统一认证中心</h3>
       </div>
 
-      <el-tabs v-model="active" :stretch="stretch" @tab-click="handleTabClick">
+      <el-tabs v-if="isShow('dd') || isShow('ww') || isShow('feishu')" v-model="active" :stretch="stretch" @tab-click="handleTabClick">
         <el-tab-pane label="账号密码" name="username">
-          <el-form-item prop="username">
-            <span class="svg-container">
-              <svg-icon icon-class="user" />
-            </span>
-            <el-input
-              ref="username"
-              v-model="loginForm.username"
-              placeholder="用户名"
-              name="username"
-              type="text"
-              tabindex="1"
-              auto-complete="on"
-            />
-          </el-form-item>
-
-          <el-form-item prop="password">
-            <span class="svg-container">
-              <svg-icon icon-class="password" />
-            </span>
-            <el-input
-              :key="passwordType"
-              ref="password"
-              v-model="loginForm.password"
-              :type="passwordType"
-              placeholder="密码"
-              name="password"
-              tabindex="2"
-              auto-complete="on"
-              @keyup.enter.native="handleLogin"
-            />
-            <span class="show-pwd" @click="showPwd">
-              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-            </span>
-          </el-form-item>
-
-          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">登录</el-button>
+          <password-login-form
+            ref="loginForm"
+            :loading="loading"
+            @submit="handleLogin"
+          />
         </el-tab-pane>
-        <el-tab-pane label="钉钉扫码" name="dd" class="qrcode">
+        <el-tab-pane v-if="isShow('dd')" label="钉钉扫码" name="dd" class="qrcode">
           <div id="dd_qrcode" class="qrcode-container" />
           <div class="tip-qrcode">
             使用钉钉扫描上方二维码登录
           </div>
         </el-tab-pane>
-        <el-tab-pane label="企业微信扫码" name="ww" class="qrcode">
+        <el-tab-pane v-if="isShow('ww')" label="企业微信扫码" name="ww" class="qrcode">
           <div id="ww_login" class="qrcode-container" />
           <div class="tip-qrcode">
             使用企业微信扫描上方二维码登录
           </div>
         </el-tab-pane>
-        <el-tab-pane label="飞书扫码" name="feishu" class="qrcode">
+        <el-tab-pane v-if="isShow('feishu')" label="飞书扫码" name="feishu" class="qrcode">
           <div id="feishu_login" class="qrcode-container" />
           <div class="tip-qrcode">
             使用飞书扫描上方二维码登录
           </div>
         </el-tab-pane>
       </el-tabs>
+
+      <!-- 仅显示账号密码登录表单 -->
+      <div v-else>
+        <password-login-form
+          ref="loginForm"
+          :loading="loading"
+          @submit="handleLogin"
+        />
+      </div>
       <div class="tips"><span>2024 © Power By 蓝色风暴 使用chrome获得最佳体验</span></div>
-    </el-form>
+    </div>
   </div>
 </template>
 
@@ -73,36 +50,28 @@
 import { FeishuQrLogin } from '@/utils/feishu'
 import { Base64 } from 'js-base64'
 import { generateState } from '@/utils/generate-stata'
+import PasswordLoginForm from './password_login'
 
 export default {
   name: 'Login',
+  components: {
+    PasswordLoginForm
+  },
   data() {
     return {
       // 指定默认登录方式
       active: 'username',
-      // 用户名密码登录表单数据
-      loginForm: {
-        username: '',
-        password: ''
-      },
       // 扫码认证相关参数（适用于钉钉、企业微信）
       qrcode: {
         redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login', // 认证成功后的回调地址
         state: generateState()
       },
-      // 用户名密码登录表单验证规则
-      loginRules: {
-        username: [{ required: true, trigger: 'change', message: '请输入用户名' }],
-        password: [{ required: true, trigger: 'change', message: '请输入用户密码' }]
-      },
       // 控制el-tabs标签页宽度自适应
       stretch: true,
-      // 控制登录按钮状态
-      loading: false,
-      // 控制密码表单显示与隐藏
-      passwordType: 'password',
       // 登录成功后跳转的路径
-      redirect: undefined
+      redirect: undefined,
+      // 控制登录按钮状态
+      loading: false
     }
   },
   watch: {
@@ -114,13 +83,13 @@ export default {
       immediate: true
     }
   },
-  created() {
-    // 页面加载时从缓存中获取上次选择的登录方式
-    const savedTab = localStorage.getItem('defaultLoginTag')
-    if (savedTab) {
-      this.active = savedTab
-    }
-  },
+  // created() {
+  //   // 页面加载时从缓存中获取上次选择的登录方式
+  //   const savedTab = localStorage.getItem('defaultLoginTag')
+  //   if (savedTab) {
+  //     this.active = savedTab
+  //   }
+  // },
   mounted() {
     // 获取路由参数
     const query = this.$route.query
@@ -139,107 +108,118 @@ export default {
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
 
     // 钉钉二维码初始化
-    if (config.VUE_APP_DINGTALK_CLIENT_ID !== '') {
-      this.ddQrcodeInit()
+    if (config.dd.enable) {
+      this.dd = true
+      if (config.dd.VUE_APP_DINGTALK_CLIENT_ID !== '') {
+        this.ddQrcodeInit()
+      } else {
+        alert('VUE_APP_DINGTALK_CLIENT_ID 未配置')
+      }
     }
 
     // 企业微信二维码初始化
-    if (config.VUE_APP_WECHAT_APP_ID !== '' && config.VUE_APP_WECHAT_AGENT_ID !== '') {
-      // 初始化登录组件
-      new window.WwLogin({
-        id: 'ww_login',
-        appid: config.VUE_APP_WECHAT_APP_ID,
-        agentid: config.VUE_APP_WECHAT_AGENT_ID,
-        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
-        state: this.qrcode.state,
-        href: `data:text/css;base64,${Base64.encode(
-          `.impowerBox .title {display: none;}
-          .impowerBox .info {display: none;}
-          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
-        )}`
-      })
+    if (config.ww.enable) {
+      this.ww = true
+      if (config.ww.VUE_APP_WECHAT_APP_ID !== '' && config.ww.VUE_APP_WECHAT_AGENT_ID !== '') {
+        // 初始化登录组件
+        new window.WwLogin({
+          id: 'ww_login',
+          appid: config.ww.VUE_APP_WECHAT_APP_ID,
+          agentid: config.ww.VUE_APP_WECHAT_AGENT_ID,
+          redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
+          state: this.qrcode.state,
+          href: `data:text/css;base64,${Base64.encode(
+            `.impowerBox .title {display: none;}
+            .impowerBox .info {display: none;}
+            .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
+          )}`
+        })
+      } else {
+        alert('VUE_APP_WECHAT_APP_ID 或 VUE_APP_WECHAT_AGENT_ID 未配置')
+      }
     }
 
     // 飞书二维码初始化
-    if (config.VUE_APP_FEISHU_CLIENT_ID !== '') {
-      FeishuQrLogin()
+    if (config.feishu.enable) {
+      this.feishu = true
+      if (config.feishu.VUE_APP_FEISHU_CLIENT_ID !== '') {
+        FeishuQrLogin()
+      } else {
+        alert('VUE_APP_FEISHU_CLIENT_ID 未配置')
+      }
     }
   },
   methods: {
 
     /* 当用户切换Tab */
-    handleTabClick(tab) {
-      // 保存当前选项到localStorage
-      localStorage.setItem('defaultLoginTag', tab.name)
-    },
+    // handleTabClick(tab) {
+    //   // 保存当前选项到localStorage
+    //   localStorage.setItem('defaultLoginTag', tab.name)
+    // },
 
-    /* 密码显示与隐藏 */
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
+    /* 判断是否显示某个登录方式 */
+    isShow(type) {
+      if (type === 'dd') {
+        return config.dd.enable
       }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
+      if (type === 'ww') {
+        return config.ww.enable
+      }
+      if (type === 'feishu') {
+        return config.feishu.enable
+      }
+      return false
     },
 
     /* 普通登录按钮 */
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
+    handleLogin(formData) {
+      this.loading = true
 
-          // 合并URL中的query参数（主要是SSO客户端的请求参数同样需要发送到后端）
-          const newForm = {
-            ...this.loginForm,
-            ...this.$route.query
+      // 合并URL中的query参数（主要是SSO客户端的请求参数同样需要发送到后端）
+      const newForm = {
+        ...formData,
+        ...this.$route.query
+      }
+
+      // 执行登录
+      this.$store.dispatch('user/login', newForm).then((res) => {
+        // redirect_uri表示SSO客户端在进行单点登录认证
+        if (res.redirect_uri !== undefined) {
+          // SAML认证
+          if (newForm.SAMLRequest) {
+            // 将授权HTML插入到当前页面的DOM中
+            const div = document.createElement('div')
+            div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
+            document.body.appendChild(div)
+            // 获取表单（saml这个ID是后端定义好后返回的）
+            const form = div.querySelector('#saml')
+            // 提交表单
+            if (form) {
+              form.submit()
+            }
+          } else {
+            // CAS3.0和OAuth2.0认证
+            window.location.href = res.redirect_uri
           }
+        }
 
-          // 执行登录
-          this.$store.dispatch('user/login', newForm).then((res) => {
-            // redirect_uri表示SSO客户端在进行单点登录认证
-            if (res.redirect_uri !== undefined) {
-              // SAML认证
-              if (newForm.SAMLRequest) {
-                // 将授权HTML插入到当前页面的DOM中
-                const div = document.createElement('div')
-                div.innerHTML = res.redirect_uri // 这里后端返回的redirect_uri实际是授权HTML
-                document.body.appendChild(div)
-                // 获取表单（saml这个ID是后端定义好后返回的）
-                const form = div.querySelector('#saml')
-                // 提交表单
-                if (form) {
-                  form.submit()
-                }
-              } else {
-                // CAS3.0和OAuth2.0认证
-                window.location.href = res.redirect_uri
-              }
-            }
-
-            // redirect表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面
-            if (res.redirect) {
-              // 如果是MFA认证，则需要将SSO客户端请求参数传递到MFA认证页面
-              this.$router.push({
-                name: res.redirect,
-                params: {
-                  token: res.token,
-                  username: this.loginForm.username
-                },
-                query: this.$route.query
-              })
-            } else {
-              this.$router.push({ path: this.redirect || '/' })
-            }
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
+        // redirect表示启动了MFA认证，需要根据后端返回的redirect名称，跳转至不同的MFA认证页面
+        if (res.redirect) {
+          // 如果是MFA认证，则需要将SSO客户端请求参数传递到MFA认证页面
+          this.$router.push({
+            name: res.redirect,
+            params: {
+              token: res.token,
+              username: this.loginForm.username
+            },
+            query: this.$route.query
           })
         } else {
-          return false
+          this.$router.push({ path: this.redirect || '/' })
         }
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
 
@@ -318,7 +298,7 @@ export default {
         },
         {
           redirect_uri: encodeURIComponent(this.qrcode.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
-          client_id: config.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
+          client_id: config.dd.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
           state: this.qrcode.state, // 固定值，认证成功后会原样返回
@@ -376,8 +356,6 @@ export default {
 </script>
 
 <style lang="scss">
-$bg:#283443;
-$light_gray:#fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -411,44 +389,6 @@ $cursor: #fff;
   .el-tabs__item.is-active{
     color:#409EFF
   }
-
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
-
-    input {
-      background: transparent;
-      border: 0px;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
-      }
-    }
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
-    margin-bottom: 15px
-  }
-
-  .login-form-switch {
-    border: initial;
-    background: initial;
-
-    .el-form-item__label {
-      color: white;
-    }
-  }
 }
 </style>
 
@@ -478,14 +418,6 @@ $light_gray:#eee;
     color: #fff;
   }
 
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-  }
-
   .title-container {
     position: relative;
 
@@ -496,16 +428,6 @@ $light_gray:#eee;
       text-align: center;
       font-weight: bold;
     }
-  }
-
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
-    cursor: pointer;
-    user-select: none;
   }
 }
 </style>

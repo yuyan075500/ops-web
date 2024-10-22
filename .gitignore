@@ -1,5 +1,5 @@
-.env.local
 .DS_Store
+public/config.js
 node_modules/
 dist/
 npm-debug.log*

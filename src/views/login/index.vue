@@ -139,17 +139,17 @@ export default {
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
 
     // 钉钉二维码初始化
-    if (process.env.VUE_APP_DINGTALK_CLIENT_ID !== '' && process.env.VUE_APP_DINGTALK_CORP_ID !== '') {
+    if (config.VUE_APP_DINGTALK_CLIENT_ID !== '') {
       this.ddQrcodeInit()
     }
 
     // 企业微信二维码初始化
-    if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
+    if (config.VUE_APP_WECHAT_APP_ID !== '' && config.VUE_APP_WECHAT_AGENT_ID !== '') {
       // 初始化登录组件
       new window.WwLogin({
         id: 'ww_login',
-        appid: process.env.VUE_APP_WECHAT_APP_ID,
-        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
+        appid: config.VUE_APP_WECHAT_APP_ID,
+        agentid: config.VUE_APP_WECHAT_AGENT_ID,
         redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
         state: this.qrcode.state,
         href: `data:text/css;base64,${Base64.encode(
@@ -161,7 +161,7 @@ export default {
     }
 
     // 飞书二维码初始化
-    if (process.env.VUE_APP_FEISHU_CLIENT_ID !== '') {
+    if (config.VUE_APP_FEISHU_CLIENT_ID !== '') {
       FeishuQrLogin()
     }
   },
@@ -318,7 +318,7 @@ export default {
         },
         {
           redirect_uri: encodeURIComponent(this.qrcode.redirect_uri), // 回调地址，需要与开发者后台钉钉登录与分享的地址保持一致，必须进行encode处理
-          client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
+          client_id: config.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
           state: this.qrcode.state, // 固定值，认证成功后会原样返回

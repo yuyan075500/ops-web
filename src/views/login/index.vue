@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-form">
       <div class="title-container">
-        <h3 class="title">统一认证中心</h3>
+        <h3 class="title">{{ title }}</h3>
       </div>
 
       <el-tabs v-if="isShow('dd') || isShow('ww') || isShow('feishu')" v-model="active" :stretch="stretch" @tab-click="handleTabClick">
@@ -41,7 +41,7 @@
           @submit="handleLogin"
         />
       </div>
-      <div class="tips"><span>2024 © Power By 蓝色风暴 使用chrome获得最佳体验</span></div>
+      <div class="tips"><span>{{ copyright }}</span></div>
     </div>
   </div>
 </template>
@@ -71,7 +71,11 @@ export default {
       // 登录成功后跳转的路径
       redirect: undefined,
       // 控制登录按钮状态
-      loading: false
+      loading: false,
+      // 版权信息
+      copyright: config.copyright,
+      // Title名称
+      title: config.title
     }
   },
   watch: {

@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '统一认证中心',
+  title: config.title,
 
   /**
    * @type {boolean} true | false

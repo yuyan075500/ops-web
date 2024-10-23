@@ -22,14 +22,14 @@ VUE_APP_WECHAT_AGENT_ID = ''
 # 飞书应用配置
 VUE_APP_FEISHU_CLIENT_ID = ''
 ```
-* ENV：环境名称，开发环境为 `development` ，生产环境为 `production`。
-* VUE_APP_BASE_API：默认为 `/` 。
+* **ENV**：环境名称，开发环境为 `development` ，生产环境为 `production`。
+* **VUE_APP_BASE_API**：默认为 `/` 。
 * VUE_APP_TITLE：自定义名称，修改后影响登录页名称、浏览器页面标题和登录系统后左上角名称。
-* VUE_APP_COPYRIGHT：自定义版权声明，修改后影响登录页下方版权声明。
-* VUE_APP_DINGTALK_CLIENT_ID：钉钉应用 `client_id` ，如果不为空则启用钉钉登录，在登录页会显示钉钉扫码登录选项。
-* VUE_APP_WECHAT_APP_ID：企业微信应用 `corp_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_AGENT_ID` 同时不为空。
-* VUE_APP_WECHAT_AGENT_ID：企业微信应用 `agent_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_APP_ID` 同时不为空。
-* VUE_APP_FEISHU_CLIENT_ID：飞书应用 `app_id` ，如果不为空则启用飞书登录，在登录页会显示飞书扫码登录选项。
+* **VUE_APP_COPYRIGHT**：自定义版权声明，修改后影响登录页下方版权声明。
+* **VUE_APP_DINGTALK_CLIENT_ID**：钉钉应用 `client_id` ，如果不为空则启用钉钉登录，在登录页会显示钉钉扫码登录选项。
+* **VUE_APP_WECHAT_APP_ID**：企业微信应用 `corp_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_AGENT_ID` 同时不为空。
+* **VUE_APP_WECHAT_AGENT_ID**：企业微信应用 `agent_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_APP_ID` 同时不为空。
+* **VUE_APP_FEISHU_CLIENT_ID**：飞书应用 `app_id` ，如果不为空则启用飞书登录，在登录页会显示飞书扫码登录选项。
 >   
 > 注意：以上配置文件为项目默认配置，如需修改请按需修改。
 >   

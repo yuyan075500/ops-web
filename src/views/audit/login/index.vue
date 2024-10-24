@@ -4,7 +4,7 @@
     <!-- 表格搜索 -->
     <el-form :inline="true">
       <el-form-item label="用户名：">
-        <el-input v-model="queryParams.username" placeholder="登录用户名" size="small" prefix-icon="el-icon-search" clearable />
+        <el-input v-model="queryParams.name" placeholder="登录用户名" size="small" prefix-icon="el-icon-search" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="searchList">查询</el-button>
@@ -46,7 +46,7 @@ export default {
       tableData: [],
       total: 0,
       queryParams: {
-        username: '',
+        name: '',
         page: 1,
         limit: 15
       }

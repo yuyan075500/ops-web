@@ -5,8 +5,13 @@ export function FeishuQrLogin() {
   const query = window.location.search
   const redirect_uri = window.location.protocol + '//' + window.location.host + '/login?byte=true' + query.replace('?', '&')
 
+  // 生成随机state
+  const state = generateState()
+  // 将state存储到localStorage，防止回调时页面刷新导致state丢失
+  localStorage.setItem('feishu_state', state)
+
   // 组装二维码获取接口地址
-  const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${process.env.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&state=${generateState()}`
+  const goto = `https://passport.feishu.cn/suite/passport/oauth/authorize?client_id=${process.env.VUE_APP_FEISHU_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirect_uri)}&response_type=code&state=${state}`
 
   // 请求生成二维码
   const QRLoginObj = window.QRLogin({

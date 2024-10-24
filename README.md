@@ -35,9 +35,9 @@ VUE_APP_FEISHU_CLIENT_ID = ''
 * VUE_APP_TITLE：自定义名称，修改后影响登录页名称、浏览器页面标题和登录系统后左上角名称。
 * **VUE_APP_COPYRIGHT**：自定义版权声明，修改后影响登录页下方版权声明。
 * **VUE_APP_DINGTALK_CLIENT_ID**：钉钉应用 `client_id` ，如果不为空则启用钉钉登录，在登录页会显示钉钉扫码登录选项。
-* **VUE_APP_WECHAT_APP_ID**：企业微信应用 `corp_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_AGENT_ID` 同时不为空。
-* **VUE_APP_WECHAT_AGENT_ID**：企业微信应用 `agent_id` ，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_APP_ID` 同时不为空。
-* **VUE_APP_FEISHU_CLIENT_ID**：飞书应用 `app_id` ，如果不为空则启用飞书登录，在登录页会显示飞书扫码登录选项。
+* **VUE_APP_WECHAT_APP_ID**：与后端配置的 `corp_id` 相同，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_AGENT_ID` 同时不为空。
+* **VUE_APP_WECHAT_AGENT_ID**：与后端配置的 `agent_id` 相同，如果不为空则启用企业微信登录，在登录页会显示企业微信扫码登录选项，需要 `VUE_APP_WECHAT_APP_ID` 同时不为空。
+* **VUE_APP_FEISHU_CLIENT_ID**：与后端配置的 `app_id` 相同，如果不为空则启用飞书登录，在登录页会显示飞书扫码登录选项。
 >   
 > 注意：由于本项目采用前后端分离架构开发，为实现SSO相关跳转功能，所以 `VUE_APP_BASE_API` 默认为 `/` ，在开发和生产环境都需要在此应用前面加一个代理层（`Nginx`、`Traefix` 等）进行动静分离，具体可以参考 [搭建开发环境](https://github.com/yuyan075500/ops-api/blob/main/deploy/dev.md) 和 [项目部署](https://github.com/yuyan075500/ops-api?tab=readme-ov-file#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2) 相关文档。
 >   

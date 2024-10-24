@@ -32,9 +32,6 @@
             <el-dropdown-item>
               <el-button class="el-button-text" size="mini" type="text" @click="handleMFA(scope.row)">MFA验证码重置</el-button>
             </el-dropdown-item>
-            <el-dropdown-item>
-              <el-button class="el-button-text" size="mini" type="text" @click="handleWW(scope.row)">企业微信绑定</el-button>
-            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </template>
@@ -74,11 +71,6 @@ export default {
     /* 重置密码按钮 */
     handlePassword(value) {
       this.$emit('reset_password', value)
-    },
-
-    /* 企业微信xdpg */
-    handleWW(value) {
-      this.$emit('ww', value)
     },
 
     /* 重置MFA按钮 */

@@ -63,8 +63,7 @@ export default {
       active: 'username',
       // 扫码认证相关参数（适用于钉钉、企业微信）
       qrcode: {
-        redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login', // 认证成功后的回调地址
-        state: generateState()
+        redirect_uri: window.location.protocol + '//' + window.location.hostname + '/login' // 认证成功后的回调地址
       },
       // 控制el-tabs标签页宽度自适应
       stretch: true,
@@ -98,16 +97,6 @@ export default {
     // 获取路由参数
     const query = this.$route.query
 
-    // 企业微信认证
-    if ('code' in query && 'appid' in query && 'state' in query) {
-      this.handleWwLogin()
-    }
-
-    // 飞书认证
-    if ('code' in query && 'byte' in query && 'state' in query) {
-      this.handleFeishuLogin()
-    }
-
     // 获取扫码登录回调地址
     this.qrcode.redirect_uri = window.location.protocol + '//' + window.location.host + '/login'
 
@@ -116,25 +105,39 @@ export default {
       this.ddQrcodeInit()
     }
 
-    // 企业微信二维码初始化
+    // 企业微信认证
     if (process.env.VUE_APP_WECHAT_APP_ID !== '' && process.env.VUE_APP_WECHAT_AGENT_ID !== '') {
-      // 初始化登录组件
-      new window.WwLogin({
-        id: 'ww_login',
-        appid: process.env.VUE_APP_WECHAT_APP_ID,
-        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
-        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
-        state: this.qrcode.state,
-        href: `data:text/css;base64,${Base64.encode(
-          `.impowerBox .title {display: none;}
-          .impowerBox .info {display: none;}
-          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
-        )}`
-      })
+      // 认证回调
+      if ('code' in query && 'appid' in query && 'state' in query) {
+        // state校验
+        const storedState = localStorage.getItem('ww_state')
+        if (query.state !== storedState) {
+          this.$message.error('请求无效')
+          return false
+        }
+        // 系统登录
+        this.handleWwLogin()
+      }
+
+      // 二维码初始化
+      this.wwQrcodeInit()
     }
 
-    // 飞书二维码初始化
+    // 飞书认证
     if (process.env.VUE_APP_FEISHU_CLIENT_ID !== '') {
+      // 认证回调
+      if ('code' in query && 'byte' in query && 'state' in query) {
+        // state校验
+        const storedState = localStorage.getItem('feishu_state')
+        if (query.state !== storedState) {
+          this.$message.error('请求无效')
+          return false
+        }
+        // 系统登录
+        this.handleFeishuLogin()
+      }
+
+      // 二维码初始化
       FeishuQrLogin()
     }
   },
@@ -244,6 +247,27 @@ export default {
       }).catch(() => {})
     },
 
+    /* 企业微信二维码初始化 */
+    wwQrcodeInit() {
+      // 生成随机state
+      const state = generateState()
+      // 将state存储到localStorage，防止回调时页面刷新导致state丢失
+      localStorage.setItem('ww_state', state)
+      // 初始化二维码
+      new window.WwLogin({
+        id: 'ww_login',
+        appid: process.env.VUE_APP_WECHAT_APP_ID,
+        agentid: process.env.VUE_APP_WECHAT_AGENT_ID,
+        redirect_uri: encodeURIComponent(this.qrcode.redirect_uri + window.location.search),
+        state: state,
+        href: `data:text/css;base64,${Base64.encode(
+          `.impowerBox .title {display: none;}
+          .impowerBox .info {display: none;}
+          .impowerBox .qrcode {width: 210px;padding-top: 15px;}`
+        )}`
+      })
+    },
+
     /* 企业微信扫码登录 */
     handleWwLogin() {
       // 授权URL请求参数设定
@@ -278,6 +302,11 @@ export default {
 
     /* 钉钉二维码初始化、扫码成功后的动作 */
     ddQrcodeInit() {
+      // 生成随机state
+      const dd_state = generateState()
+      // 将state存储到localStorage，防止回调时页面刷新导致state丢失
+      localStorage.setItem('dd_state', dd_state)
+
       window.DTFrameLogin(
         // 二维码容器相关参数：绑定的容器id、宽度、高度
         {
@@ -290,16 +319,19 @@ export default {
           client_id: process.env.VUE_APP_DINGTALK_CLIENT_ID, // 钉钉应用的client_id
           scope: 'openid', // 固定值
           response_type: 'code', // 固定值
-          state: this.qrcode.state, // 固定值，认证成功后会原样返回
+          state: dd_state, // 固定值，认证成功后会原样返回
           prompt: 'consent' // 固定值
         },
         (loginResult) => {
           // 获取扫码认证成功后的数据
           const { authCode, state } = loginResult
 
+          // 获取请求时的state
+          const storedState = localStorage.getItem('dd_state')
+
           // 判断状态是否一致
-          if (this.qrcode.state !== state) {
-            this.$message.error('状态不一致')
+          if (storedState !== state) {
+            this.$message.error('请求无效')
             return false
           }
 

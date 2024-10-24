@@ -3,8 +3,8 @@
 
     <!-- 表格搜索 -->
     <el-form :inline="true">
-      <el-form-item label="用户名：">
-        <el-input v-model="queryParams.name" placeholder="登录用户名" size="small" prefix-icon="el-icon-search" clearable />
+      <el-form-item label="关键字：">
+        <el-input v-model="queryParams.name" placeholder="支持用户名、IP、Agent和城市" size="small" prefix-icon="el-icon-search" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="searchList">查询</el-button>

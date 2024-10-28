@@ -20,7 +20,7 @@
     </el-row>
 
     <!-- 表格组件 -->
-    <corn-list-table
+    <cron-list-table
       :table-data="tableData"
       @edit="handleEdit"
       @delete="handleDelete"
@@ -42,21 +42,34 @@
     <!-- 新增与编辑 -->
     <el-dialog
       :title="formTitle"
-      :visible.sync="cornAddDialog"
+      :visible.sync="cronAddDialog"
       :show-close="false"
       width="800px"
       :close-on-click-modal="false"
       @closed="handleClose"
     >
       <!-- 表单组件 -->
-      <corn-add-form
+      <cron-add-form
         ref="form"
         :form-title="formTitle"
         :form="currentValue"
         :loading="loading"
         @close="handleClose"
         @submit="handleSubmit"
+        @describe="cronDescribeDialog = true"
       />
+    </el-dialog>
+
+    <!-- 计划任务填写说明 -->
+    <el-dialog
+      title="计划任务填写说明"
+      :visible.sync="cronDescribeDialog"
+      :show-close="true"
+      width="700px"
+      :close-on-click-modal="true"
+    >
+      <!-- 表单组件 -->
+      <cron-describe />
     </el-dialog>
   </div>
 </template>
@@ -64,13 +77,15 @@
 <script>
 import { Message } from 'element-ui'
 import { getTaskList, addTask, deleteTask, changeTask } from '@/api/system/task'
-import CornListTable from './table'
-import CornAddForm from './form'
+import CronListTable from './table'
+import CronAddForm from './form'
+import CronDescribe from './cron'
 
 export default {
   components: {
-    CornListTable,
-    CornAddForm
+    CronListTable,
+    CronAddForm,
+    CronDescribe
   },
   data() {
     return {
@@ -84,7 +99,8 @@ export default {
         page: 1,
         limit: 15
       },
-      cornAddDialog: false
+      cronAddDialog: false,
+      cronDescribeDialog: false
     }
   },
   created() {
@@ -123,7 +139,7 @@ export default {
     /* 新增任务 */
     handleAdd() {
       // 显示弹框
-      this.cornAddDialog = true
+      this.cronAddDialog = true
       // 更改弹框标题
       this.formTitle = '新增任务'
     },
@@ -131,7 +147,7 @@ export default {
     /* 编辑任务 */
     handleEdit(rowData) {
       // 打开Dialog
-      this.cornAddDialog = true
+      this.cronAddDialog = true
       // 更改Dialog标题
       this.formTitle = '修改任务'
       // 将当前行数据赋值给currentValue
@@ -214,7 +230,7 @@ export default {
     /* 表单关闭 */
     handleClose() {
       // 关闭所有Dialog
-      this.cornAddDialog = false
+      this.cronAddDialog = false
       // 清空表单及空梭框数据
       this.currentValue = undefined
       // 清空校验规则

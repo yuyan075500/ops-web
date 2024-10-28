@@ -31,7 +31,7 @@
 import moment from 'moment'
 
 export default {
-  name: 'CornListTable',
+  name: 'CronListTable',
   props: {
     tableData: {
       type: Array,

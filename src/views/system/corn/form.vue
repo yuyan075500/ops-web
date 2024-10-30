@@ -28,7 +28,7 @@
         <el-col :span="14">
           <el-form-item v-if="form.type === 2" label="内置方法：" prop="built_in_method">
             <el-select v-model="form.built_in_method" placeholder="请输入或选择" allow-create filterable clearable style="width: 100%">
-              <el-option v-for="(item, index) in methods" :key="index" :label="item" :value="item" />
+              <el-option v-for="item in methods" :key="item.value" :label="item.name" :value="item.value" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -76,7 +76,11 @@ export default {
   },
   data() {
     return {
-      methods: ['用户密码过期提醒', 'OpenLDAP用户同步', 'Windows AD用户同步'],
+      // 请务随意更改value，该值用于后端任务执行逻辑判断
+      methods: [
+        { value: 'password_expire_notify', name: '用户密码过期提醒' },
+        { value: 'user_sync', name: '用户同步（Windows AD、OpenLDAP）' }
+      ],
       rules: {
         name: [
           { required: true, message: '请输入任务名称', trigger: 'change' }

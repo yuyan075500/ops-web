@@ -21,6 +21,7 @@
 
     <!-- 表格组件 -->
     <cron-list-table
+      v-loading="loading"
       :table-data="tableData"
       @edit="handleEdit"
       @delete="handleDelete"
@@ -71,6 +72,18 @@
       <!-- 表单组件 -->
       <cron-describe />
     </el-dialog>
+
+    <!-- 计划任务执行记录 -->
+    <el-dialog
+      title="计划任务执行记录"
+      :visible.sync="cronLogDialog"
+      :show-close="true"
+      width="700px"
+      :close-on-click-modal="false"
+    >
+      <!-- 表单组件 -->
+      <log-table :task-id="taskId" />
+    </el-dialog>
   </div>
 </template>
 
@@ -80,12 +93,14 @@ import { getTaskList, addTask, deleteTask, changeTask } from '@/api/system/task'
 import CronListTable from './table'
 import CronAddForm from './form'
 import CronDescribe from './cron'
+import LogTable from './log'
 
 export default {
   components: {
     CronListTable,
     CronAddForm,
-    CronDescribe
+    CronDescribe,
+    LogTable
   },
   data() {
     return {
@@ -94,13 +109,15 @@ export default {
       total: 0,
       formTitle: '',
       currentValue: undefined,
+      taskId: undefined,
       queryParams: {
         name: '',
         page: 1,
         limit: 15
       },
       cronAddDialog: false,
-      cronDescribeDialog: false
+      cronDescribeDialog: false,
+      cronLogDialog: false
     }
   },
   created() {
@@ -144,6 +161,14 @@ export default {
       this.formTitle = '新增任务'
     },
 
+    /* 任务日志 */
+    handleLog(rowData) {
+      // 显示弹框
+      this.cronLogDialog = true
+      // 获取任务ID
+      this.taskId = rowData.ID
+    },
+
     /* 编辑任务 */
     handleEdit(rowData) {
       // 打开Dialog
@@ -153,9 +178,6 @@ export default {
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
-
-    /* 任务执行日志 */
-    handleLog(rowData) {},
 
     /* 删除定时任务 */
     handleDelete(rowData) {

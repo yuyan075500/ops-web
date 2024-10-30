@@ -10,7 +10,12 @@
       </template>
     </el-table-column>
     <el-table-column :formatter="dateFormat" prop="last_run_at" label="上次执行时间" min-width="4%" />
-    <el-table-column prop="last_run_result" label="上次执行结果" min-width="3%" />
+    <el-table-column show-overflow-tooltip label="上次执行结果" min-width="3%">
+      <template slot-scope="scope">
+        <el-tag v-if="scope.row.last_run_result === '成功'" type="success">成功</el-tag>
+        <el-tag v-else type="danger">失败</el-tag>
+      </template>
+    </el-table-column>
     <el-table-column prop="execution_count" label="执行次数" min-width="2%" />
     <el-table-column prop="enabled" label="任务状态" min-width="2%">
       <template slot-scope="scope">

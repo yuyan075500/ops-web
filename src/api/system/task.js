@@ -34,3 +34,12 @@ export function getTaskList(params) {
     params
   })
 }
+
+// 获取定时任务执行日志列表
+export function getTaskLogList(params) {
+  return request({
+    url: '/api/v1/task/logs',
+    method: 'get',
+    params
+  })
+}

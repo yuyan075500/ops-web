@@ -4,19 +4,22 @@
       <div class="title-container">
         <h3 class="title">密码自助修改</h3>
       </div>
-
       <el-form-item label="用户名：" prop="username">
         <el-input v-model="form.username" placeholder="请输入登录用户名" name="username" type="text" />
       </el-form-item>
-
-      <el-form-item label="手机号：" prop="phone_number">
+      <el-form-item label="验证方式：" prop="validate_type">
+        <el-radio-group v-model="form.validate_type">
+          <el-radio :label="1" class="white-radio">短信验证码</el-radio>
+          <el-radio :label="2" class="white-radio">MFA验证码</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item v-if="form.validate_type === 1" label="手机号：" prop="phone_number">
         <el-input v-model="form.phone_number" placeholder="请输入绑定手机号" name="phone_number" type="text" />
       </el-form-item>
       <el-form-item label="校验码：" prop="code">
         <el-input v-model="form.code" placeholder="6位校验码" name="code" type="text" style="width: 100px" />
-        <el-button type="info" style="margin-left: 15px" :disabled="isActive" @click="handleVerificationCode('form')">{{ buttonText }}</el-button>
+        <el-button type="info" style="margin-left: 15px" :disabled="isActive || form.validate_type === 2" @click="handleVerificationCode('form')">{{ buttonText }}</el-button>
       </el-form-item>
-
       <el-form-item label="新密码：" prop="password">
         <el-input v-model="form.password" show-password placeholder="请输入新密码" name="password" type="password" />
       </el-form-item>
@@ -70,6 +73,7 @@ export default {
       form: {
         username: '',
         phone_number: '',
+        validate_type: 1,
         code: '',
         password: '',
         re_password: ''
@@ -81,6 +85,9 @@ export default {
         phone_number: [
           { required: true, message: '请输入手机号', trigger: 'change' },
           { validator: validatePhone, trigger: 'change' }
+        ],
+        validate_type: [
+          { required: true, message: '请选择验证方式', trigger: 'change' }
         ],
         code: [
           { required: true, message: '请输入校验码', trigger: 'change' }
@@ -171,6 +178,7 @@ export default {
             phone_number: '',
             code: '',
             password: '',
+            validate_type: 1,
             re_password: ''
           }
           // 清空校验规则
@@ -214,5 +222,11 @@ $light_gray:#eee;
       text-align: center;
     }
   }
+}
+</style>
+
+<style>
+.white-radio .el-radio__label {
+  color: white;
 }
 </style>

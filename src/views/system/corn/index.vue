@@ -78,7 +78,7 @@
       title="计划任务执行记录"
       :visible.sync="cronLogDialog"
       :show-close="true"
-      width="700px"
+      width="800px"
       :close-on-click-modal="false"
     >
       <!-- 表单组件 -->

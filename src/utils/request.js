@@ -34,13 +34,6 @@ service.interceptors.response.use(
 
     // 业务状态码为非0的请求处理（0表示正常的业务状态码）
     if (res.code !== 0) {
-      // 在浏览器中显示错误信息
-      Message({
-        message: res.msg,
-        type: 'error',
-        duration: 2 * 1000
-      })
-
       // 如果状态码为90514表示Token无效或Token过期，进行特殊处理
       if (res.code === 90514) {
         // 重新登录
@@ -54,6 +47,11 @@ service.interceptors.response.use(
           })
         })
       } else {
+        Message({
+          message: res.msg,
+          type: 'error',
+          duration: 2 * 1000
+        })
         return Promise.reject(new Error(res.msg))
       }
     } else {

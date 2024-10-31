@@ -202,7 +202,7 @@ export default {
             name: res.redirect,
             params: {
               token: res.token,
-              username: this.loginForm.username
+              username: newForm.username
             },
             query: this.$route.query
           })

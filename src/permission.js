@@ -54,29 +54,34 @@ router.beforeEach(async(to, from, next) => {
         NProgress.done()
       }
     } else {
-      const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
+      if (whiteList.indexOf(to.path) !== -1) {
+        // 如果访问的URL在免登录白名单，则直接跳转
         next()
       } else {
-        try {
-          // 获取用户信息
-          await store.dispatch('user/getInfo')
+        const hasGetUserInfo = store.getters.name
+        if (hasGetUserInfo) {
+          next()
+        } else {
+          try {
+            // 获取用户信息
+            await store.dispatch('user/getInfo')
 
-          // 生成用户菜单
-          if (store.getters.menus.length < 1) {
-            global.antRouter = []
-            next()
+            // 生成用户菜单
+            if (store.getters.menus.length < 1) {
+              global.antRouter = []
+              next()
+            }
+            const menus = filterAsyncRouter(store.getters.menus)
+            router.addRoutes(menus)
+            global.antRouter = menus
+
+            next({ ...to, replace: true })
+          } catch (error) {
+            // 移除token并回到登录页面
+            await store.dispatch('user/resetToken')
+            next(`/login?redirect=${to.path}`)
+            NProgress.done()
           }
-          const menus = filterAsyncRouter(store.getters.menus)
-          router.addRoutes(menus)
-          global.antRouter = menus
-
-          next({ ...to, replace: true })
-        } catch (error) {
-          // 移除token并回到登录页面
-          await store.dispatch('user/resetToken')
-          next(`/login?redirect=${to.path}`)
-          NProgress.done()
         }
       }
     }
@@ -87,7 +92,7 @@ router.beforeEach(async(to, from, next) => {
       // 如果访问的URL在免登录白名单，则直接跳转
       next()
     } else {
-      // 如果访问的URL在尖在免登录白名单，则跳转至登录页
+      // 如果访问的URL没在免登录白名单，则跳转至登录页
       next(`/login?redirect=${to.path}`)
       NProgress.done()
     }

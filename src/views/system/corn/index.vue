@@ -42,6 +42,7 @@
 
     <!-- 新增与编辑 -->
     <el-dialog
+      v-if="cronAddDialog"
       :title="formTitle"
       :visible.sync="cronAddDialog"
       :show-close="false"

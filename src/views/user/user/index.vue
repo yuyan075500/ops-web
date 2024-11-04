@@ -242,9 +242,7 @@ export default {
     },
 
     /* 打开用户同步规则 */
-    handleRuleDetails() {
-      console.log(1111)
-    },
+    handleRuleDetails() {},
 
     /* 删除用户 */
     handleDelete(rowData) {

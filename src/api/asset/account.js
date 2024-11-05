@@ -51,10 +51,28 @@ export function deleteAccount(data) {
   })
 }
 
-// 修改账号
+// 修改账号信息
 export function changeAccount(data) {
   return request({
     url: '/api/v1/account',
+    method: 'put',
+    data
+  })
+}
+
+// 修改密码
+export function changeAccountPassword(data) {
+  return request({
+    url: '/api/v1/account/password',
+    method: 'put',
+    data
+  })
+}
+
+// 账号分享
+export function shareAccount(data) {
+  return request({
+    url: '/api/v1/account/users',
     method: 'put',
     data
   })

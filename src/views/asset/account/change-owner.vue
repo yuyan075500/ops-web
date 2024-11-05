@@ -1,9 +1,9 @@
 <template>
   <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%">
-    <el-form-item label="用户" prop="auth_user_id">
+    <el-form-item label="用户" prop="owner_user_id">
       <el-select
-        v-model="form.auth_user_id"
-        placeholder="请输入用户姓名自动查找"
+        v-model="form.owner_user_id"
+        placeholder="输入用户姓名自动查找"
         filterable
         remote
         default-first-option
@@ -13,6 +13,7 @@
       >
         <el-option v-for="item in tagOptions" :key="item.key" :label="item.label" :value="item.key" />
       </el-select>
+      <div class="help-block" style="color: #999; font-size: 12px">可输入用户姓名查找对应的用户</div>
     </el-form-item>
     <el-form-item>
       <div>
@@ -31,7 +32,7 @@ export default {
       type: Object,
       default() {
         return {
-          auth_user_id: ''
+          owner_user_id: ''
         }
       }
     },
@@ -48,14 +49,17 @@ export default {
       loadingSearch: false,
       tagOptions: [],
       rules: {
-        auth_user_id: [
+        owner_user_id: [
           { required: true, message: '请选择账号所有者', trigger: 'change' }
         ]
       }
     }
   },
   created() {
-    this.tagOptions = []
+    const currentUser = this.users.find(user => user.key === this.form.owner_user_id)
+    if (currentUser) {
+      this.tagOptions = [currentUser]
+    }
   },
   methods: {
 
@@ -76,7 +80,7 @@ export default {
         setTimeout(() => {
           this.loadingSearch = false
           this.tagOptions = this.users.filter(item => {
-            return item.label.includes(query)
+            return item.label.includes(query) || item.key.toString().includes(query)
           })
         }, 200)
       } else {

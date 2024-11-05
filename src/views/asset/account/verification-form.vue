@@ -9,7 +9,7 @@
     <el-form-item label="验证码：" prop="code">
       <el-input v-model="form.code" autocomplete="off" placeholder="6位验证码" clearable style="width: 150px" />
       <el-button type="info" style="margin-left: 15px" :disabled="canClick" @click="getSmSCode()">{{ verifyCode }}</el-button>
-      <div class="help-block" style="color: #999; font-size: 12px">认证成功后的有效期为5分钟</div>
+      <div class="help-block" style="color: #999; font-size: 12px">认证成功后可在10分钟内获取任意密码</div>
     </el-form-item>
     <el-form-item>
       <div>

@@ -44,6 +44,7 @@
 
     <!-- 表格行编辑 -->
     <el-dialog
+      v-if="accountAddDialog"
       :title="formTitle"
       :visible.sync="accountAddDialog"
       :show-close="false"
@@ -62,6 +63,7 @@
 
     <!-- 重置用户密码 -->
     <el-dialog
+      v-if="passwordDialog"
       :title="formTitle"
       :visible.sync="passwordDialog"
       :show-close="false"
@@ -72,14 +74,15 @@
       <!-- 表单组件 -->
       <set-password-form
         ref="form"
-        :form="currentValue"
+        :user="currentValue"
         @close="handleClose"
-        @submit="handleSubmit"
+        @submit="handlePasswordSubmit"
       />
     </el-dialog>
 
     <!-- 获取验证码表单 -->
     <el-dialog
+      v-if="getCodeDialog"
       :title="formTitle"
       :visible.sync="getCodeDialog"
       :show-close="false"
@@ -88,18 +91,30 @@
       @close="handleClose"
     >
       <!-- 表单组件 -->
-      <sms-form ref="form" :form="currentValue" @close="getCodeDialog = false" @submit="handleCodeVerification" />
+      <sms-form
+        ref="form"
+        :form="currentValue"
+        @close="getCodeDialog = false"
+        @submit="handleCodeVerification"
+      />
     </el-dialog>
 
     <!-- 账号分享 -->
     <el-dialog
+      v-if="accountShareDialog"
       :title="formTitle"
       :visible.sync="accountShareDialog"
       :show-close="false"
       width="700px"
       :close-on-click-modal="false"
+      @close="handleClose"
     >
-      <user-transfer :transfer-data="transferData" @close="accountShareDialog = false" @submit="handleSubmit" />
+      <user-transfer
+        ref="form"
+        :transfer-data="transferData"
+        @close="accountShareDialog = false"
+        @submit="handleShareSubmit"
+      />
     </el-dialog>
 
     <!-- 所有者更改 -->
@@ -125,7 +140,7 @@
 
 <script>
 import { Message } from 'element-ui'
-import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification } from '@/api/asset/account'
+import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification, shareAccount, changeAccountPassword } from '@/api/asset/account'
 import { getUserListAll } from '@/api/user/user'
 import AccountTable from './table'
 import AccountAddForm from './form'
@@ -236,11 +251,13 @@ export default {
     },
 
     /* 重置账号密码 */
-    handleSetPassword() {
+    handleSetPassword(rowData) {
       // 更改弹框标题
       this.formTitle = '密码重置'
       // 显示弹框
       this.passwordDialog = true
+      // 将行数据赋值给表单
+      this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
 
     /* 账号所有权转移 */
@@ -250,6 +267,7 @@ export default {
       // 更改弹框标题
       this.formTitle = '所有权转移'
       // 将行数据赋值给表单
+      // rowData['owner_user_id'] = rowData.owner.name
       this.currentValue = JSON.parse(JSON.stringify(rowData))
     },
 
@@ -264,12 +282,14 @@ export default {
       // 获取所有用户
       this.transferData.optionalUser = this.users
       // 定义已存储用户列表
-      this.transferData.existUser = rowData.users
+      if (rowData.users !== null) {
+        this.transferData.existUser = rowData.users.map(user => user.id)
+      }
     },
 
     /* 删除账号 */
     handleDelete(rowData) {
-      this.$confirm('此记录将永久删除, 是否继续?', '提示', {
+      this.$confirm('点击确认当前账号将从系统中永久删除。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -313,6 +333,40 @@ export default {
     /* 验证码校验 */
     handleCodeVerification(rowData) {
       codeVerification(rowData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
+    /* 分享账号 */
+    handleShareSubmit(formData) {
+      shareAccount(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
+    /* 更改密码 */
+    handlePasswordSubmit(formData) {
+      changeAccountPassword(formData).then((res) => {
         if (res.code === 0) {
           Message({
             message: res.msg,

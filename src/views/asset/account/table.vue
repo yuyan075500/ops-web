@@ -5,7 +5,7 @@
     <el-table-column show-overflow-tooltip prop="username" label="用户名" min-width="5%" />
     <el-table-column show-overflow-tooltip prop="login_address" label="登录地址" min-width="10%" />
     <el-table-column prop="app" label="登录方式" min-width="5%" />
-    <el-table-column show-overflow-tooltip prop="account_owner.name" label="所有者" min-width="5%" />
+    <el-table-column show-overflow-tooltip prop="owner.name" label="所有者" min-width="5%" />
     <el-table-column show-overflow-tooltip prop="note" label="备注" min-width="10%" />
     <el-table-column prop="password" label="密码" min-width="5%" align="center">
       <template slot-scope="scope">

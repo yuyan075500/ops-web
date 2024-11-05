@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="transferData" :model="transferData">
+  <el-form ref="form" :model="transferData">
     <el-form-item>
       <el-transfer
         v-model="transferData.existUser"
@@ -13,8 +13,7 @@
           hasChecked: '${checked}/${total}'
         }"
         :data="transferData.optionalUser"
-      >
-      </el-transfer>
+      />
     </el-form-item>
     <div class="btn">
       <el-button size="mini" @click="cancel">取 消</el-button>
@@ -40,7 +39,6 @@ export default {
     handleSubmit() {
       const { id, existUser } = this.transferData
       const data = { 'id': id, 'users': existUser }
-      console.log(data)
       this.$emit('submit', data)
     },
 

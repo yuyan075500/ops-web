@@ -19,13 +19,10 @@
 export default {
   name: 'SetPasswordForm',
   props: {
-    form: {
+    user: {
       type: Object,
       default() {
-        return {
-          password: '',
-          re_password: ''
-        }
+        return {}
       }
     },
     loading: {
@@ -41,6 +38,11 @@ export default {
       }
     }
     return {
+      form: {
+        id: '',
+        password: '',
+        re_password: ''
+      },
       rules: {
         password: [
           { required: true, message: '请输入用户密码', trigger: 'change' }
@@ -60,6 +62,7 @@ export default {
         if (!valid) {
           return
         }
+        this.form.id = this.user.id
         this.$emit('submit', this.form)
       })
     },

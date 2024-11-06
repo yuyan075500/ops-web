@@ -46,6 +46,7 @@
 
     <!-- 新增修改用户 -->
     <el-dialog
+      v-if="userAddDialog"
       :title="formTitle"
       :visible.sync="userAddDialog"
       :show-close="false"
@@ -65,6 +66,7 @@
 
     <!-- 重置用户密码 -->
     <el-dialog
+      v-if="resetPasswordDialog"
       :title="formTitle"
       :visible.sync="resetPasswordDialog"
       :show-close="false"

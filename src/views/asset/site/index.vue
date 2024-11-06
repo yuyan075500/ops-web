@@ -50,6 +50,7 @@
 
     <!-- 添加站点分组 -->
     <el-dialog
+      v-if="groupAddDialog"
       :title="formTitle"
       :visible.sync="groupAddDialog"
       :show-close="false"
@@ -68,6 +69,7 @@
 
     <!-- 管理站点标签 -->
     <el-dialog
+      v-if="siteTagDialog"
       :title="formTitle"
       :visible.sync="siteTagDialog"
       :show-close="false"
@@ -111,6 +113,7 @@
 
     <!-- 用户管理 -->
     <el-dialog
+      v-if="userDialog"
       :title="formTitle"
       :visible.sync="userDialog"
       :show-close="false"

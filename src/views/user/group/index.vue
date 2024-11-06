@@ -43,6 +43,7 @@
 
     <!-- 新增修改分组 -->
     <el-dialog
+      v-if="groupAddDialog"
       :title="formTitle"
       :visible.sync="groupAddDialog"
       :show-close="false"
@@ -62,6 +63,7 @@
 
     <!-- 用户管理 -->
     <el-dialog
+      v-if="userDialog"
       :title="formTitle"
       :visible.sync="userDialog"
       :show-close="false"

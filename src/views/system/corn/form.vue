@@ -49,7 +49,7 @@
       <el-form-item>
         <div>
           <el-button size="mini" @click="cancel">取 消</el-button>
-          <el-button type="primary" size="mini" @click="handleSubmit">确 定</el-button>
+          <el-button type="primary" size="mini" :loading="loading" @click="handleSubmit">确 定</el-button>
         </div>
       </el-form-item>
     </el-form>
@@ -72,6 +72,9 @@ export default {
           enabled: true
         }
       }
+    },
+    loading: {
+      type: Boolean
     }
   },
   data() {

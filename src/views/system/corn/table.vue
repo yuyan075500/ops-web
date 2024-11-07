@@ -13,7 +13,7 @@
     <el-table-column show-overflow-tooltip label="上次执行结果" min-width="3%">
       <template slot-scope="scope">
         <el-tag v-if="scope.row.last_run_result === '成功'" type="success">成功</el-tag>
-        <el-tag v-else type="danger">失败</el-tag>
+        <el-tag v-if="scope.row.last_run_result === '失败'" type="danger">失败</el-tag>
       </template>
     </el-table-column>
     <el-table-column prop="execution_count" label="执行次数" min-width="2%" />

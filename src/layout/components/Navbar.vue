@@ -100,6 +100,7 @@
                     :show-file-list="false"
                     :on-change="handleChange"
                     :on-success="handleSuccess"
+                    :on-error="handleError"
                   >
                     <img v-if="avatarPreview !== undefined" :src="avatarPreview" class="avatar">
                     <img v-else-if="avatar !== ''" :src="avatar" class="avatar">
@@ -210,6 +211,20 @@ export default {
     /* 图片发生变化 */
     handleChange(file, fileList) {
       this.avatarPreview = URL.createObjectURL(file.raw)
+    },
+
+    /* 图片上传成功回调*/
+    handleError(err, file, fileList) {
+      // 获取错误消息
+      const errorMessage = err.message
+      const jsonStr = errorMessage.replace('Error: ', '')
+      const errorObj = JSON.parse(jsonStr)
+      const msg = errorObj.msg
+      Message({
+        message: msg,
+        type: 'error',
+        duration: 2 * 1000
+      })
     },
 
     /* 图片上传成功回调*/

@@ -17,7 +17,7 @@
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAddUser">新增</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-refresh" size="mini" @click="handleUserSync">LDAP账号同步</el-button>
+        <el-button type="primary" plain icon="el-icon-refresh" size="mini" @click="handleUserSync">用户同步</el-button>
       </el-col>
     </el-row>
 
@@ -95,6 +95,18 @@
         @submit="handleSubmit"
       />
     </el-dialog>
+
+    <!-- 用户同步规则 -->
+    <el-dialog
+      title="用户同步规则"
+      :visible.sync="userSyncRuleDialog"
+      :show-close="true"
+      width="700px"
+      :close-on-click-modal="true"
+    >
+      <!-- 表单组件 -->
+      <rule-describe />
+    </el-dialog>
   </div>
 </template>
 
@@ -103,13 +115,15 @@ import { Message } from 'element-ui'
 import { getUserList, addUser, changeUser, resetPassword, deleteUser, resetMFA, userSync } from '@/api/user/user'
 import UserListTable from './table'
 import UserAddForm from './form'
+import RuleDescribe from './rule'
 import ResetUserPasswordForm from './reset-password-form'
 
 export default {
   components: {
     UserListTable,
     UserAddForm,
-    ResetUserPasswordForm
+    ResetUserPasswordForm,
+    RuleDescribe
   },
   data() {
     return {
@@ -125,7 +139,8 @@ export default {
         limit: 15
       },
       userAddDialog: false,
-      resetPasswordDialog: false
+      resetPasswordDialog: false,
+      userSyncRuleDialog: false
     }
   },
   created() {
@@ -209,7 +224,7 @@ export default {
 
     /* AD域用户同步 */
     handleUserSync() {
-      this.$confirm('点击确认将从LDAP中同步用户信息，你还可以了解更详细的同步规则。', '提示', {
+      this.$confirm('点击确认将从Windows AD或OpenLDAP中同步用户信息，点击了解详细<a href="javascript:;" id="handleRuleDetails" style="color: #66b1ff;">同步规则</a>。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -241,10 +256,20 @@ export default {
           }
         }
       }).then(() => {}).catch(() => {})
+
+      // 添加事件监听器
+      this.$nextTick(() => {
+        const link = document.getElementById('handleRuleDetails')
+        if (link) {
+          link.addEventListener('click', this.handleRuleDetails)
+        }
+      })
     },
 
     /* 打开用户同步规则 */
-    handleRuleDetails() {},
+    handleRuleDetails() {
+      this.userSyncRuleDialog = true
+    },
 
     /* 删除用户 */
     handleDelete(rowData) {

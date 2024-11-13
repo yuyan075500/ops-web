@@ -15,9 +15,10 @@
     <el-row :gutter="10">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
-        <el-button type="primary" plain icon="el-icon-thumb" size="mini" @click="handleMove">移交</el-button>
+        <el-button type="primary" plain icon="el-icon-thumb" size="mini" @click="handleMove">批量移交</el-button>
         <el-button type="primary" plain icon="el-icon-upload2" size="mini" @click="handleUpload">导入</el-button>
         <el-button type="primary" plain icon="el-icon-download" size="mini" @click="handleDownload">下载</el-button>
+        <span style="color: #999; font-size: 12px;margin-left: 5px;vertical-align: bottom;">小提示：在执行批量移交和下载前请先选中对应的数据。</span>
       </el-col>
     </el-row>
 
@@ -28,6 +29,7 @@
       @edit="handleEdit"
       @account-share="handleShare"
       @change-owner="handleChangeOwner"
+      @select-change="handleSelectChange"
       @delete="handleDelete"
       @set-password="handleSetPassword"
       @get-password="handleGetPassword"
@@ -37,7 +39,7 @@
     <el-pagination
       background
       :current-page="queryParams.page"
-      :page-sizes="[10, 15, 20, 30, 40]"
+      :page-sizes="[15, 20, 50, 100, 500]"
       :page-size="queryParams.limit"
       :total="total"
       layout="total, sizes, prev, pager, next, jumper"
@@ -51,7 +53,7 @@
       :title="formTitle"
       :visible.sync="accountAddDialog"
       :show-close="false"
-      width="500px"
+      width="700px"
       :close-on-click-modal="false"
       @close="handleClose"
     >
@@ -139,6 +141,25 @@
       />
     </el-dialog>
 
+    <!-- 批量所有者更改 -->
+    <el-dialog
+      v-if="ownersChangeDialog"
+      :title="formTitle"
+      :visible.sync="ownersChangeDialog"
+      :show-close="false"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <!-- 表单组件 -->
+      <change-owner-form
+        ref="form"
+        :accounts="selectData"
+        :users="users"
+        @close="ownersChangeDialog = false"
+        @submit="handleBatchUpdateAccountOwner"
+      />
+    </el-dialog>
+
     <!-- 导入账号列表 -->
     <el-dialog
       v-if="accountUploadDialog"
@@ -175,8 +196,9 @@
 </template>
 
 <script>
+import * as XLSX from 'xlsx'
 import { Message } from 'element-ui'
-import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification, shareAccount, changeAccountPassword, addAccounts } from '@/api/asset/account'
+import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification, shareAccount, changeAccountPassword, addAccounts, batchUpdateAccountOwner } from '@/api/asset/account'
 import { getUserListAll } from '@/api/user/user'
 import AccountTable from './table'
 import AccountAddForm from './form'
@@ -204,6 +226,7 @@ export default {
       total: 0,
       formTitle: undefined,
       currentValue: undefined,
+      selectData: undefined,
       tableData: [],
       queryParams: {
         name: '',
@@ -221,6 +244,7 @@ export default {
       getCodeDialog: false,
       accountShareDialog: false,
       ownerChangeDialog: false,
+      ownersChangeDialog: false,
       accountUploadTableDialog: false,
       accountUploadDialog: false
     }
@@ -282,8 +306,13 @@ export default {
       this.formTitle = '新增'
     },
 
-    /* 转移账号 */
-    handleMove() {},
+    /* 批量账号所有权转移 */
+    handleMove() {
+      // 显示弹框
+      this.ownersChangeDialog = true
+      // 更改弹框标题
+      this.formTitle = '批量所有权转移'
+    },
 
     /* 上传账号 */
     handleUpload() {
@@ -301,7 +330,21 @@ export default {
     },
 
     /* 导出账号 */
-    handleDownload() {},
+    handleDownload() {
+      // 判断是否有选中的数据
+      if (this.selectData === undefined) {
+        this.$message.warning('没有选中任何数据')
+        return
+      }
+
+      // selectData转换为Excel的数据结构
+      const ws = XLSX.utils.json_to_sheet(this.selectData)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+
+      // 生成Excel文件并下载
+      XLSX.writeFile(wb, '账号.xlsx')
+    },
 
     /* 修改账号 */
     handleEdit(rowData) {
@@ -330,8 +373,12 @@ export default {
       // 更改弹框标题
       this.formTitle = '所有权转移'
       // 将行数据赋值给表单
-      // rowData['owner_user_id'] = rowData.owner.name
       this.currentValue = JSON.parse(JSON.stringify(rowData))
+    },
+
+    /* 存储选中的行 */
+    handleSelectChange(val) {
+      this.selectData = val
     },
 
     /* 账号分享 */
@@ -461,6 +508,23 @@ export default {
       })
     },
 
+    /* 批量账号所有者更改 */
+    handleBatchUpdateAccountOwner(formData) {
+      batchUpdateAccountOwner(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
     /* 新增修改 */
     handleSubmit(formData) {
       // 对id进行判断，有id表示修改，没有表示新增
@@ -502,9 +566,11 @@ export default {
       this.accountShareDialog = false
       this.getCodeDialog = false
       this.ownerChangeDialog = false
+      this.ownersChangeDialog = false
       this.accountUploadDialog = false
       // 清空表单数据
       this.currentValue = undefined
+      this.selectData = undefined
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

@@ -42,6 +42,11 @@ export default {
     },
     loading: {
       type: Boolean
+    },
+    // 批量账号转移时传入的账号列表
+    accounts: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -69,7 +74,15 @@ export default {
         if (!valid) {
           return
         }
-        this.$emit('submit', this.form)
+        if (this.accounts && this.accounts.length > 0) {
+          const data = {
+            owner_user_id: this.form.owner_user_id,
+            accounts: this.accounts.map(row => row.id) // 提取出账号的id
+          }
+          this.$emit('submit', data)
+        } else {
+          this.$emit('submit', this.form)
+        }
       })
     },
 

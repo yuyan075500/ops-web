@@ -1,10 +1,10 @@
 <template>
-  <el-table :data="tableData" tooltip-effect="dark" style="width: 100%; margin-top:10px;" size="mini" border>
+  <el-table :data="tableData" tooltip-effect="dark" style="width: 100%; margin-top:10px;" size="mini" border @selection-change="handleSelectionChange">
     <el-table-column type="selection" width="40" />
     <el-table-column show-overflow-tooltip prop="name" label="账号名称" min-width="8%" />
     <el-table-column show-overflow-tooltip prop="username" label="用户名" min-width="5%" />
     <el-table-column show-overflow-tooltip prop="login_address" label="登录地址" min-width="10%" />
-    <el-table-column prop="app" label="登录方式" min-width="5%" />
+    <el-table-column prop="login_method" label="登录方式" min-width="5%" />
     <el-table-column show-overflow-tooltip prop="owner.name" label="所有者" min-width="5%" />
     <el-table-column show-overflow-tooltip prop="note" label="备注" min-width="10%" />
     <el-table-column prop="password" label="密码" min-width="5%" align="center">
@@ -71,6 +71,11 @@ export default {
     /* 账号分享 */
     handleAccountShare(value) {
       this.$emit('account-share', value)
+    },
+
+    /* 批量账号分享（将选中的值传给父组件） */
+    handleSelectionChange(val) {
+      this.$emit('select-change', val)
     },
 
     /* 所有权转移 */

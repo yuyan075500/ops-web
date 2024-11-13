@@ -69,6 +69,15 @@ export function changeAccount(data) {
   })
 }
 
+// 批量账号所有者更改
+export function batchUpdateAccountOwner(data) {
+  return request({
+    url: '/api/v1/account/owners',
+    method: 'put',
+    data
+  })
+}
+
 // 修改密码
 export function changeAccountPassword(data) {
   return request({

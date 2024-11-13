@@ -1,23 +1,35 @@
 <template>
-  <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%">
-    <el-form-item label="账号名称" prop="name">
-      <el-input v-model="form.name" autocomplete="off" clearable />
-    </el-form-item>
+  <el-form ref="form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="right" label-width="100px" style="width: 95%" size="small">
+    <el-row>
+      <el-col :span="10">
+        <el-form-item label="账号名称" prop="name">
+          <el-input v-model="form.name" autocomplete="off" clearable />
+        </el-form-item>
+      </el-col>
+      <el-col :span="14">
+        <el-form-item label="登录方式">
+          <el-input v-model="form.login_method" autocomplete="off" clearable />
+          <div class="help-block" style="color: #999; font-size: 12px">描述如何登录，如：WEB浏览器、SSH客户端等</div>
+        </el-form-item>
+      </el-col>
+    </el-row>
     <el-form-item label="登录地址">
       <el-input v-model="form.login_address" autocomplete="off" clearable />
     </el-form-item>
-    <el-form-item label="登录方式">
-      <el-input v-model="form.login_method" autocomplete="off" clearable />
-      <div class="help-block" style="color: #999; font-size: 12px">如：网页、小程序、某APP、某客户端程序、Shell命令行等</div>
-    </el-form-item>
-    <el-form-item label="用户名">
-      <el-input v-model="form.username" autocomplete="off" clearable />
-    </el-form-item>
-    <el-form-item v-if="form.id === undefined" label="密码" prop="password">
-      <el-input v-model="form.password" type="password" show-password autocomplete="off" clearable />
-    </el-form-item>
+    <el-row>
+      <el-col :span="10">
+        <el-form-item label="登录用户名">
+          <el-input v-model="form.username" autocomplete="off" clearable />
+        </el-form-item>
+      </el-col>
+      <el-col :span="14">
+        <el-form-item v-if="form.id === undefined" label="登录密码" prop="password">
+          <el-input v-model="form.password" type="password" show-password autocomplete="off" clearable />
+        </el-form-item>
+      </el-col>
+    </el-row>
     <el-form-item label="备注">
-      <el-input v-model="form.note" type="textarea" autocomplete="off" clearable />
+      <el-input v-model="form.note" type="textarea" :rows="3" autocomplete="off" clearable />
     </el-form-item>
     <el-form-item>
       <div>

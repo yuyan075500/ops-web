@@ -43,6 +43,15 @@ export function addAccount(data) {
   })
 }
 
+// 批量新增账号
+export function addAccounts(data) {
+  return request({
+    url: '/api/v1/accounts',
+    method: 'post',
+    data
+  })
+}
+
 // 删除账号
 export function deleteAccount(data) {
   return request({

@@ -35,7 +35,7 @@
       <el-col :span="12">
         <el-form-item label="企业微信ID" prop="ww_id">
           <el-input v-model="form.ww_id" autocomplete="off" clearable />
-          <div class="help-block" style="color: #999; font-size: 12px">需要登录<el-link :underline="false" type="primary" href="https://work.weixin.qq.com" target="_blank" style="font-size: 12px">企业微信管理后台</el-link>，在通讯录中获取</div>
+          <div class="help-block" style="color: #999; font-size: 12px">需要登录《<el-link :underline="false" type="primary" href="https://work.weixin.qq.com" target="_blank" style="font-size: 12px">企业微信管理后台</el-link>》，在通讯录中获取</div>
         </el-form-item>
       </el-col>
     </el-row>

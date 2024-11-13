@@ -15,6 +15,9 @@
     <el-row :gutter="10">
       <el-col :span="1.5">
         <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button type="primary" plain icon="el-icon-thumb" size="mini" @click="handleMove">移交</el-button>
+        <el-button type="primary" plain icon="el-icon-upload2" size="mini" @click="handleUpload">导入</el-button>
+        <el-button type="primary" plain icon="el-icon-download" size="mini" @click="handleDownload">下载</el-button>
       </el-col>
     </el-row>
 
@@ -135,12 +138,45 @@
         @submit="handleSubmit"
       />
     </el-dialog>
+
+    <!-- 导入账号列表 -->
+    <el-dialog
+      v-if="accountUploadDialog"
+      :title="formTitle"
+      :visible.sync="accountUploadDialog"
+      :show-close="false"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <!-- 表单组件 -->
+      <upload-form
+        ref="form"
+        :form="currentValue"
+        :users="users"
+        @close="accountUploadDialog = false"
+        @table="handleOpenTable"
+        @submit="handleBatchCreate"
+      />
+    </el-dialog>
+
+    <!-- 账号解析结果 -->
+    <el-dialog
+      v-if="accountUploadTableDialog"
+      title="待导入账号缓存列表"
+      :visible.sync="accountUploadTableDialog"
+      :show-close="true"
+      width="800px"
+      :close-on-click-modal="true"
+    >
+      <!-- 表单组件 -->
+      <upload-table :table-data="currentValue" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { Message } from 'element-ui'
-import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification, shareAccount, changeAccountPassword } from '@/api/asset/account'
+import { getAccountList, deleteAccount, changeAccount, addAccount, getAccountPassword, codeVerification, shareAccount, changeAccountPassword, addAccounts } from '@/api/asset/account'
 import { getUserListAll } from '@/api/user/user'
 import AccountTable from './table'
 import AccountAddForm from './form'
@@ -148,6 +184,8 @@ import SetPasswordForm from './password-form'
 import SmsForm from './verification-form'
 import UserTransfer from './user-transfer'
 import ChangeOwnerForm from './change-owner'
+import UploadForm from './upload-form'
+import UploadTable from './upload-table'
 
 export default {
   components: {
@@ -156,6 +194,8 @@ export default {
     SetPasswordForm,
     SmsForm,
     UserTransfer,
+    UploadForm,
+    UploadTable,
     ChangeOwnerForm
   },
   data() {
@@ -180,7 +220,9 @@ export default {
       passwordDialog: false,
       getCodeDialog: false,
       accountShareDialog: false,
-      ownerChangeDialog: false
+      ownerChangeDialog: false,
+      accountUploadTableDialog: false,
+      accountUploadDialog: false
     }
   },
   created() {
@@ -239,6 +281,27 @@ export default {
       // 更改Dialog标题
       this.formTitle = '新增'
     },
+
+    /* 转移账号 */
+    handleMove() {},
+
+    /* 上传账号 */
+    handleUpload() {
+      // 打开Dialog
+      this.accountUploadDialog = true
+      // 更改Dialog标题
+      this.formTitle = '批量导入账号'
+    },
+
+    handleOpenTable(tableData) {
+      // 打开Dialog
+      this.accountUploadTableDialog = true
+      // 将数据赋值给表格
+      this.currentValue = tableData
+    },
+
+    /* 导出账号 */
+    handleDownload() {},
 
     /* 修改账号 */
     handleEdit(rowData) {
@@ -381,6 +444,23 @@ export default {
       })
     },
 
+    /* 批量新增 */
+    handleBatchCreate(formData) {
+      addAccounts(formData).then((res) => {
+        if (res.code === 0) {
+          Message({
+            message: res.msg,
+            type: 'success',
+            duration: 1000
+          })
+          this.loading = false
+          this.handleClose()
+        }
+      }, () => {
+        this.loading = false
+      })
+    },
+
     /* 新增修改 */
     handleSubmit(formData) {
       // 对id进行判断，有id表示修改，没有表示新增
@@ -422,6 +502,7 @@ export default {
       this.accountShareDialog = false
       this.getCodeDialog = false
       this.ownerChangeDialog = false
+      this.accountUploadDialog = false
       // 清空表单数据
       this.currentValue = undefined
       // 清空校验规则

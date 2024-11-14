@@ -27,3 +27,12 @@ export function getLoginRecordList(params) {
     params
   })
 }
+
+// 获取用户登录记录
+export function getOplogList(params) {
+  return request({
+    url: '/api/v1/audit/oplog',
+    method: 'get',
+    params
+  })
+}

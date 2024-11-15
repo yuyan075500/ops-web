@@ -11,6 +11,13 @@
       </el-form-item>
     </el-form>
 
+    <!-- 表格头 -->
+    <el-row :gutter="10">
+      <el-col :span="1.5">
+        <span style="color: #999; font-size: 12px;margin-left: 5px;vertical-align: bottom;">小提示：为确保敏感信息泄露，在请求参数和返回数据中所有敏感字段均已做删除处理。</span>
+      </el-col>
+    </el-row>
+
     <!-- 表格组件 -->
     <oplog-list-table
       v-loading="loading"

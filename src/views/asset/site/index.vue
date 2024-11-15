@@ -268,8 +268,8 @@ export default {
       // 将当前行数据赋值给currentValue
       this.currentValue = JSON.parse(JSON.stringify(rowData))
       // 定义分组已存在用户列表
-      for (let i = 0; i < rowData.users.length; i++) {
-        this.transferData.rightData.push(rowData.users[i].id)
+      if (rowData.users !== null) {
+        this.transferData.rightData = rowData.users.map(row => row.id)
       }
     },
 
@@ -461,7 +461,10 @@ export default {
       // 清空表单数据
       this.currentValue = undefined
       this.group = NaN
-      this.transferData.rightData = []
+      this.transferData = {
+        leftData: [],
+        rightData: []
+      }
       // 清空校验规则
       this.$refs.form.$refs.form.resetFields()
       // 获取最新数据

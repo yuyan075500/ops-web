@@ -78,8 +78,13 @@ export default {
           headers.forEach((header, index) => {
             account[header] = row[index]
           })
-          return account
-        })
+          // 检查是否为非空行（至少有一个字段有数据）
+          if (Object.values(account).some(value => value !== undefined && value !== null && value !== '')) {
+            return account
+          } else {
+            return null
+          }
+        }).filter(account => account !== null)
 
         // 更新表单数据
         this.form.accounts = accounts

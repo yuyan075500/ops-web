@@ -4,10 +4,10 @@
     <el-table-column prop="username" label="用户名" min-width="2%" />
     <el-table-column show-overflow-tooltip prop="endpoint" label="接口" min-width="4%" />
     <el-table-column prop="method" label="请求方法" min-width="2%" />
+    <el-table-column prop="client_ip" label="客户端IP" min-width="3%" />
     <el-table-column :formatter="dateFormat" prop="CreatedAt" label="请求时间" min-width="3%" />
     <el-table-column show-overflow-tooltip prop="request_params" label="请求参数" min-width="3%" />
     <el-table-column show-overflow-tooltip prop="response_data" label="返回数据" min-width="3%" />
-    <el-table-column prop="client_ip" label="客户端IP" min-width="3%" />
     <el-table-column show-overflow-tooltip prop="user_agent" label="UserAgent" min-width="6%" />
   </el-table>
 </template>

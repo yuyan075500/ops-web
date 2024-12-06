@@ -3,7 +3,13 @@
     <el-form ref="form" class="login-form" :model="form" :rules="rules" :validate-on-rule-change="false" label-position="left" label-width="110px">
       <div class="title-container">
         <h3 class="title">MFA认证绑定</h3>
-        <h5 class="note">使用Google身份验器、阿里云或华为云APP扫描二维码，获取6位数字验证码</h5>
+        <h5 class="note">
+          请使用<!--
+          --><a href="https://baike.baidu.com/item/Google%20Authenticator/58350750" target="_blank" rel="noopener noreferrer">Google身份验器APP</a>、<!--
+          --><a href="https://promotion.aliyun.com/ntms/mobile.html" target="_blank" rel="noopener noreferrer">阿里云APP</a><!--
+          -->或<a href="https://www.huaweicloud.com/mobile_app/hwapp.html" target="_blank" rel="noopener noreferrer">华为云APP</a>
+          扫描下方二维码
+        </h5>
       </div>
 
       <div class="block" style="text-align: center;margin-bottom: 25px">
@@ -11,13 +17,13 @@
       </div>
 
       <el-form-item label="动态验证码：" prop="code">
-        <el-input v-model="form.code" placeholder="6位数字动态验证码" name="code" type="text" />
-        <div class="help-block" style="color: #999; font-size: 12px">请在输入动态验证码，还剩余：{{ seconds }}s，倒计时结束请重新登录</div>
+        <el-input v-model="form.code" placeholder="验证码" name="code" type="text" />
+        <div class="help-block" style="color: #999; font-size: 12px">请输入6位数字动态验证码，还剩余：{{ seconds }}s，倒计时结束请重新登录</div>
       </el-form-item>
 
       <el-row>
         <el-col :span="12">
-          <el-button type="primary" style="width: 90%;margin-bottom: 20px" @click="handleBack">重新登录</el-button>
+          <el-button type="primary" style="width: 90%;margin-bottom: 20px" @click="handleBack">返回重新登录</el-button>
         </el-col>
         <el-col :span="12">
           <el-button type="primary" style="width: 90%;margin-bottom: 20px" :disabled="seconds === 0" @click="handleNext">登录</el-button>
@@ -30,7 +36,7 @@
         :closable="false"
       >
         <template slot="title">
-          <div class="iconSize">请勿刷新页面，当页面刷新后需要返回登录页重新对账号进行认证</div>
+          <div class="iconSize">请勿刷新页面，否则需要返回登录页重新认证后操作</div>
         </template>
       </el-alert>
     </el-form>
@@ -184,6 +190,15 @@ $light_gray:#eee;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+
+      a {
+        color: $light_gray;
+        text-decoration: none;
+
+        &:hover {
+          color: #0056b3; /* 鼠标悬停时的颜色 */
+        }
+      }
     }
   }
 }

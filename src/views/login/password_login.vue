@@ -36,6 +36,11 @@
         </span>
       </el-form-item>
     </el-form>
+    <!-- 忘记密码和帮助链接 -->
+    <div class="helper-links">
+      <a class="help-link" href="https://www.idsphere.cn" target="_blank">帮助中心</a>
+      <a class="forgot-password" :href="forgotPassword" target="_blank">忘记密码？</a>
+    </div>
     <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:20px;" @click.native.prevent="handleLogin">登录</el-button>
   </div>
 </template>
@@ -50,6 +55,8 @@ export default {
   },
   data() {
     return {
+      // 重置密码链接
+      forgotPassword: window.location.protocol + '//' + window.location.hostname + '/reset_password',
       // 用户名密码登录表单数据
       form: {
         username: '',
@@ -149,6 +156,33 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  // 忘记密码和帮助链接样式
+  .helper-links {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    a {
+      font-size: 14px;
+      color: $dark_gray;
+      text-decoration: none;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $light_gray;
+      }
+    }
+
+    .help-link {
+      margin-left: 10px;
+      text-align: left;
+    }
+
+    .forgot-password {
+      text-align: right;
+    }
   }
 }
 </style>

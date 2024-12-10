@@ -4,8 +4,9 @@
     <el-table-column prop="username" label="登录用户名" min-width="3%" />
     <el-table-column :formatter="dateFormat" prop="CreatedAt" label="登录时间" min-width="4%" />
     <el-table-column prop="source_ip" label="客户端IP" min-width="3%" />
-    <el-table-column prop="city" label="登录城市" min-width="3%" />
-    <el-table-column show-overflow-tooltip prop="user_agent" label="客户端Agent" min-width="7%" />
+    <el-table-column prop="application" label="登录应用" min-width="3%" />
+    <el-table-column prop="city" label="登录城市" min-width="2%" />
+    <el-table-column show-overflow-tooltip prop="user_agent" label="客户端Agent" min-width="6%" />
     <el-table-column prop="auth_method" label="认证方法" min-width="3%" />
     <el-table-column prop="status" label="状态" min-width="3%" align="center">
       <template slot-scope="scope">

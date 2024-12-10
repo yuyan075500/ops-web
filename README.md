@@ -25,7 +25,7 @@ VUE_APP_BASE_API = '/'
 VUE_APP_TITLE = '统一认证中心'
 
 # 版权声明
-VUE_APP_COPYRIGHT = '2024 © Power By 蓝色风暴 使用chrome获得最佳体验'
+VUE_APP_COPYRIGHT = '2024 © Power By IDSphere 使用chrome获得最佳体验'
 
 # 钉钉应用配置
 VUE_APP_DINGTALK_CLIENT_ID = ''

@@ -18,6 +18,11 @@
       </template>
     </el-table-column>
     <el-table-column prop="user_from" label="来源" min-width="3%" />
+    <el-table-column prop="password_expired_at" label="密码过期时间" min-width="5%">
+      <template slot-scope="scope">
+        {{ scope.row.password_expired_at !== null && scope.row.password_expired_at !== undefined ? dateFormat(scope.row, scope.column) : '永不过期' }}
+      </template>
+    </el-table-column>
     <el-table-column :formatter="dateFormat" prop="last_login_at" label="最后登录时间" min-width="5%" />
     <el-table-column label="操作" min-width="6%" align="center">
       <template slot-scope="scope">
@@ -81,9 +86,7 @@ export default {
     /* 日期时间格式化 */
     dateFormat: function(row, column) {
       const date = row[column.property]
-      if (date === undefined || date === null) {
-        return '从未登录'
-      } else {
+      if (!(date === undefined || date === null)) {
         return moment(date).format('YYYY-MM-DD HH:mm:ss')
       }
     }

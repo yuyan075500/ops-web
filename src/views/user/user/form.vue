@@ -16,7 +16,7 @@
       <el-col :span="12">
         <el-form-item label="邮箱地址：" prop="email">
           <el-input v-model="form.email" autocomplete="off" clearable />
-          <div class="help-block" style="color: #999; font-size: 12px">非本地用户不支持更改个人信息</div>
+          <div class="help-block" style="color: #999; font-size: 12px">仅本地用户支持更改个人信息</div>
         </el-form-item>
       </el-col>
       <el-col :span="12">
@@ -32,6 +32,22 @@
           <div class="help-block" style="color: #999; font-size: 12px"><el-link :underline="false" type="primary" style="font-size: 12px" @click="handleGeneratePassword">点击生成随机密码</el-link></div>
         </el-form-item>
       </el-col>
+      <el-col :span="12">
+        <el-form-item label="有效期至：">
+          <el-date-picker
+            v-model="form.password_expired_at"
+            align="right"
+            type="datetime"
+            size="small"
+            placeholder="选择日期"
+            :picker-options="pickerOptions"
+            style="width: 100%;"
+          />
+          <div class="help-block" style="color: #999; font-size: 12px">如果日期为空则表示永不过期</div>
+        </el-form-item>
+      </el-col>
+    </el-row>
+    <el-row>
       <el-col :span="12">
         <el-form-item label="企业微信ID" prop="ww_id">
           <el-input v-model="form.ww_id" autocomplete="off" clearable />
@@ -63,7 +79,8 @@ export default {
           phone_number: '',
           email: '',
           password: '',
-          ww_id: ''
+          ww_id: '',
+          password_expired_at: null
         }
       }
     },
@@ -81,6 +98,50 @@ export default {
       }
     }
     return {
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: '30天后',
+            onClick(picker) {
+              const date = new Date()
+              date.setDate(date.getDate() + 30)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '60天后',
+            onClick(picker) {
+              const date = new Date()
+              date.setDate(date.getDate() + 60)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '90天后',
+            onClick(picker) {
+              const date = new Date()
+              date.setDate(date.getDate() + 90)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '120天后',
+            onClick(picker) {
+              const date = new Date()
+              date.setDate(date.getDate() + 120)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '180天后',
+            onClick(picker) {
+              const date = new Date()
+              date.setDate(date.getDate() + 180)
+              picker.$emit('pick', date)
+            }
+          }
+        ]
+      },
       rules: {
         name: [
           { required: true, message: '请输入姓名', trigger: 'change' }
@@ -121,7 +182,7 @@ export default {
         }
 
         // 获取出表单中的数据
-        const { id, username, password, phone_number, email, name, is_active, ww_id } = this.form
+        const { id, username, password, phone_number, email, name, is_active, ww_id, password_expired_at } = this.form
         const data = {
           'id': id,
           'username': username,
@@ -130,7 +191,8 @@ export default {
           'email': email,
           'name': name,
           'ww_id': ww_id,
-          'is_active': is_active
+          'is_active': is_active,
+          'password_expired_at': password_expired_at
         }
 
         // 获取表单数据

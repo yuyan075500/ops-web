@@ -252,6 +252,7 @@ export default {
       // 清空表单及空梭框数据
       this.currentValue = undefined
       this.transferData.rightData = []
+      this.transferData.leftData = []
       // 关闭loading状态
       this.loading = false
       // 清空校验规则

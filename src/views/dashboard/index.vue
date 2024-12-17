@@ -35,11 +35,7 @@
                   <el-tag v-for="(tag, idx) in item.tags" :key="idx" size="mini">{{ tag }}</el-tag>
                 </div>
                 <div class="item-bottom">
-                  <a href="" target="_blank">
-                    <div>官网地址</div>
-                  </a>
-                  <div class="divider" />
-                  <a href="" target="_blank">
+                  <a :href="item.helper_url" target="_blank">
                     <div>帮助文档</div>
                   </a>
                 </div>

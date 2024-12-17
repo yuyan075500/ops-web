@@ -43,6 +43,13 @@
         </el-form-item>
       </el-col>
     </el-row>
+    <el-row>
+      <el-col :span="20">
+        <el-form-item label="帮忙文档 URL：">
+          <el-input v-model="form.helper_url" autocomplete="off" clearable />
+        </el-form-item>
+      </el-col>
+    </el-row>
     <el-row :gutter="20">
       <el-col :span="20">
         <el-form-item label="SP Metadata URL：">
@@ -112,6 +119,7 @@ export default {
           name: '',
           icon: '',
           address: '',
+          helper_url: null,
           site_group_id: null,
           description: '',
           callback_url: null,

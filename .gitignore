@@ -1,5 +1,6 @@
 .DS_Store
 .env.local
+.env.ylsk
 node_modules/
 dist/
 npm-debug.log*

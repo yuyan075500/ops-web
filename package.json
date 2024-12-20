@@ -7,6 +7,7 @@
     "local": "vue-cli-service serve --mode local",
     "dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
+    "build:ylsk": "vue-cli-service build --mode ylsk",
     "preview": "node build/index.js --preview",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml",
     "lint": "eslint --ext .js,.vue src",

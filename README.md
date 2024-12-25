@@ -46,7 +46,7 @@ VUE_APP_FEISHU_CLIENT_ID = ''
 * [ ] **VUE_APP_WECHAT_AGENT_ID**：企业微信应用 `agent_id`。
 * [ ] **VUE_APP_FEISHU_CLIENT_ID**：飞书应用的 `client_id`，对应后端配置的 `app_id`，如果不为空则表示启用飞书扫码登录，配置正确会在登录页显示飞书扫码登录选项。
 >   
-> 注意：由于项目使用前后端分离架构，为实现 `SSO` 自动跳转功能，因此 `VUE_APP_BASE_API` 默认为 `/`。在开发和生产环境都需要增加一个代理层（`Nginx`、`Traefix` 等）实现动静分离，具体可以参考 [搭建开发环境](https://github.com/yuyan075500/ops-api/blob/main/deploy/dev.md) 和 [项目部署](https://github.com/yuyan075500/ops-api?tab=readme-ov-file#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2) 相关文档。
+> 注意：由于项目使用前后端分离架构，为实现 `SSO` 自动跳转功能，因此 `VUE_APP_BASE_API` 默认为 `/`。在开发和生产环境都需要增加一个代理层（`Nginx`、`Traefix` 等）实现动静分离，具体可以参考 [搭建开发环境](https://github.com/yuyan075500/idsphere/blob/main/deploy/dev.md) 和 [项目部署](https://github.com/yuyan075500/idsphere?tab=readme-ov-file#%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2) 相关文档。
 >   
 # 开发调试
 开发环境建议使用 `VS Code` 工具，配置文件位于项目根目录，配置文件名为 `.env.development`。
